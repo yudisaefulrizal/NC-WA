@@ -33,7 +33,23 @@ function render(sessions) {
     cell(row, '').append(status);
     const actions = document.createElement('div'); actions.className = 'actions';
     const link = document.createElement('a'); link.href = `/qr.html?session=${encodeURIComponent(session.id)}`; link.textContent = 'Buka QR';
-    actions.append(link);
+    if (session.status !== 'connected' && session.status !== 'logged_out') actions.append(link);
+    for (const [action, label] of [['logout', 'Logout'], ['delete', 'Hapus']]) {
+      if (action === 'logout' && session.status === 'logged_out') continue;
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = action === 'delete' ? 'danger' : 'secondary'; button.textContent = label;
+      button.addEventListener('click', async () => {
+        const prompt = action === 'delete' ? `Hapus session ${session.id} beserta data login lokal? Untuk mencabut perangkat di HP, lakukan logout terlebih dahulu.` : `Logout WhatsApp untuk session ${session.id}?`;
+        if (!confirm(prompt)) return;
+        button.disabled = true;
+        try {
+          await api(`/sessions/${encodeURIComponent(session.id)}${action === 'logout' ? '/logout' : ''}`, { method: action === 'logout' ? 'POST' : 'DELETE' });
+          signature = ''; await refresh();
+        } catch (error) { notice.textContent = error.message; }
+        finally { button.disabled = false; }
+      });
+      actions.append(button);
+    }
     cell(row, '').append(actions);
   }
 }
