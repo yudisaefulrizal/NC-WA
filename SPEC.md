@@ -31,7 +31,7 @@ Broadcast/kontak/jadwal → urusan aplikasi pemakai.
 - [ ] Auth state persisten
 - [ ] Queue kirim + jeda
 - [ ] API key
-- [ ] Log per session
+- [ ] Log kejadian sistem ke stdout
 - [ ] Simpan media masuk ke disk
 - [ ] Hapus media otomatis (`MEDIA_RETENTION_DAYS`, default 7)
 
@@ -60,6 +60,47 @@ Key-nya sama dengan yang dipakai aplikasi client.
 
 Kalau diakses dari internet (bukan localhost), wajib HTTPS —
 tanpa itu key lewat jaringan dalam bentuk polos.
+
+## Log
+
+Ke stdout. Kejadian sistem saja, bukan lalu lintas pesan.
+
+Yang dicatat:
+- Perubahan status session + alasannya
+- Reconnect (percobaan ke berapa, berhasil/gagal)
+- Webhook gagal + percobaan ulang
+- Error
+
+Tidak dicatat: isi pesan, API key, auth state.
+Pesan masuk/keluar tidak dilog sama sekali — itu urusan client.
+
+Tanpa library logger, tanpa level, tanpa file. `console.log`
+dengan timestamp dan session id sudah cukup untuk satu proses.
+
+## Glosarium
+
+**Session** — satu nomor WhatsApp yang tersambung ke engine. Punya id
+sendiri (`toko-a`), auth state sendiri, dan socket sendiri.
+
+**Auth state** — kredensial hasil scan QR. Disimpan engine sebagai file JSON,
+terus-menerus diperbarui Baileys selama session hidup. Hilang = scan ulang.
+
+**JID** — alamat WhatsApp internal. Pribadi `628123@s.whatsapp.net`,
+grup `1234567890-1234567@g.us`. Client kirim nomor polos, engine yang
+membentuk JID-nya.
+
+**Pairing / scan** — proses menyambungkan nomor lewat QR. Engine jadi
+"linked device" dari HP, seperti WhatsApp Web.
+
+**Logout vs disconnect** — logout itu device dihapus dari HP, auth state mati,
+harus scan ulang. Disconnect cuma koneksi putus, auth masih sah,
+engine tinggal reconnect.
+
+**Client** — aplikasi yang memakai engine ini lewat API. Bukan HP,
+bukan browser.
+
+**Engine** — aplikasi ini sendiri. Disebut engine karena tidak punya
+logika bisnis: cuma menjalankan perintah per satu pesan.
 
 ## Keamanan
 
@@ -108,10 +149,31 @@ Langkah instal ditulis setelah kodenya jadi.
 # API
 
 Auth: header `X-API-Key`
-Error: `{ "error": "pesan" }`
 
 Nomor ditulis polos: `628123456789`
 Grup pakai id grup: `1234567890-1234567@g.us`
+
+## Error
+
+```json
+{ "error": "session_not_connected", "message": "Session toko-a belum tersambung" }
+```
+
+Client mencocokkan `error`, bukan `message`. Teks `message` bisa berubah.
+
+| `error` | HTTP | Arti |
+|---|---|---|
+| `unauthorized` | 401 | API key salah atau tidak ada |
+| `invalid_request` | 400 | Body tidak sesuai |
+| `session_not_found` | 404 | Session id tidak ada |
+| `session_exists` | 409 | Session id sudah dipakai |
+| `session_not_connected` | 409 | Session ada tapi belum tersambung |
+| `invalid_number` | 400 | Nomor tidak terdaftar di WhatsApp |
+| `media_not_found` | 404 | File sudah kedaluwarsa atau tidak ada |
+| `send_failed` | 502 | Gagal kirim ke WhatsApp |
+
+Berhasil selalu 200. Yang bisa dicoba ulang: `session_not_connected`,
+`send_failed`.
 
 ---
 
@@ -211,6 +273,10 @@ Dihitung sejak engine start, disimpan di memori. Reset waktu restart.
 
 ## Kirim
 
+Endpoint kirim menunggu sampai pesan benar-benar terkirim, baru membalas.
+Antrean dan jeda diurus engine di belakang, jadi request bisa tertahan
+beberapa detik kalau sedang ramai. Response 200 = sudah sampai WhatsApp.
+
 ### Teks
 `POST /sessions/toko-a/messages/text`
 ```json
@@ -218,6 +284,11 @@ Dihitung sejak engine start, disimpan di memori. Reset waktu restart.
 ```
 ```json
 { "messageId": "3EB0...", "to": "628123456789@s.whatsapp.net" }
+```
+
+Ke grup — `to` diisi id grup:
+```json
+{ "to": "1234567890-1234567@g.us", "text": "halo semua" }
 ```
 
 ### Media
