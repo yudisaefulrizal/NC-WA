@@ -11,6 +11,10 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.post('/sessions/:id/typing', async (req, res) => {
+    const input = object(req.body);
+    res.json(await manager.typing(req.params.id, recipient(input.to), input.state));
+  });
   app.post('/sessions/:id/read', async (req, res) => {
     const input = object(req.body);
     res.json(await manager.read(req.params.id, recipient(input.from), requiredString(input.messageId, 'messageId', 200), input.sender === undefined ? undefined : recipient(input.sender)));

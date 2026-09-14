@@ -55,7 +55,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
 ## 4. Presence
 - [x] Tandai dibaca
-- [ ] Sedang mengetik (kirim `available` dulu)
+- [x] Sedang mengetik (kirim `available` dulu)
 
 **Uji**
 - [manual] Tandai dibaca → centang biru muncul di HP pengirim

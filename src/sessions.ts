@@ -15,6 +15,7 @@ export class ApiError extends Error {
 export interface Connection {
   close(): void | Promise<void>;
   logout(): Promise<void>;
+  typing?(jid: string, state: 'composing' | 'paused'): Promise<void>;
   read?(jid: string, messageId: string, sender?: string): Promise<void>;
   send?(jid: string, content: Outbound): Promise<string>;
   exists?(jid: string): Promise<boolean>;
@@ -83,6 +84,15 @@ export class SessionManager {
     try { await session.opening; }
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
+  }
+  async typing(id: string, jid: string, state: unknown) {
+    if (state !== 'composing' && state !== 'paused') throw new ApiError(400, 'invalid_request', 'state harus composing atau paused');
+    const connection = this.connected(id);
+    try {
+      if (!connection.typing) throw new Error('Transport tidak mendukung presence');
+      await connection.typing(jid, state);
+      return { ok: true };
+    } catch { throw new ApiError(502, 'send_failed', 'Gagal memperbarui presence'); }
   }
   async read(id: string, jid: string, messageId: string, sender?: string) {
     const connection = this.connected(id);

@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 4 — Presence
-**Sedang dikerjakan:** presence sedang mengetik
+**Sedang dikerjakan:** dashboard daftar session
 
 **Sudah selesai:**
-- Tahap 1–3 dan endpoint tandai dibaca
+- Tahap 1–4 diimplementasikan
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** presence sedang mengetik
+**Berikutnya:** dashboard daftar session

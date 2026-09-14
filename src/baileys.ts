@@ -54,6 +54,10 @@ export function baileysConnector(store: SessionStore): Connector {
       }
     });
     return {
+      async typing(jid, state) {
+        await socket.sendPresenceUpdate('available');
+        await socket.sendPresenceUpdate(state, jid);
+      },
       async read(jid, messageId, sender) {
         const cached = messageKeys.get(`${jid}:${messageId}`);
         if (jid.endsWith('@g.us') && !cached && !sender) throw new ApiError(400, 'invalid_request', 'sender wajib untuk pesan grup yang belum dikenal setelah restart');
