@@ -58,11 +58,10 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 **Sudah selesai:**
 - Seluruh implementasi tahap 1–6; 28 tes, build, dan uji browser lolos
 - Server terbaru aktif; toko-a tetap connected setelah restart
-- Pesan masuk dikonfirmasi pemilik; uji kirim teks nyata mendapat HTTP 200
+- Pesan masuk dan pengiriman teks sampai di HP tujuan dikonfirmasi pemilik
 
 **Menunggu pemilik:**
-- Konfirmasi teks uji tampil di HP tujuan
 - Uji jaringan/device, media/grup, webhook dan presence
 - Uji dashboard dengan HP serta instalasi bersih di server lain
 
-**Berikutnya:** uji manual pengiriman, webhook, presence, dan instalasi
+**Berikutnya:** uji media/grup, webhook, presence, dan instalasi

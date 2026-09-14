@@ -34,7 +34,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] Kirim ke session yang belum connected → 409
 - [x] [agent] Body tanpa `to` → 400
 - [x] [agent] Queue benar-benar memberi jeda antar pesan
-- [manual] Teks sampai di HP tujuan
+- [x] [manual] Teks sampai di HP tujuan
 - [manual] Gambar + caption sampai, dokumen bisa dibuka
 - [manual] Kirim ke grup sampai
 
@@ -103,5 +103,5 @@ berikutnya. Sisa UI paling belakang.
 - Smoke HTTP server terbaru: dashboard/QR/dokumentasi/statistik 200, API tanpa key 401.
 - Pemilik mengonfirmasi pesan masuk ke nomor yang login; webhook belum terkonfirmasi.
 - Satu uji kirim teks nyata melalui toko-a menghasilkan HTTP 200 dan messageId.
-  Konfirmasi pesan tampil di HP tujuan masih menunggu; checklist pengiriman
-  sampai di HP belum ditandai lulus. Tes manual lainnya tetap menunggu.
+  Pemilik mengonfirmasi teks berhasil terkirim dan diterima di HP tujuan.
+  Tes manual lainnya tetap menunggu.
