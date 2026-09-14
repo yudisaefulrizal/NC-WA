@@ -1,6 +1,7 @@
+import { downloadPublicMedia } from './download.js';
 import { ApiError, type SessionManager } from './sessions.js';
 export type MediaType = 'image' | 'document' | 'audio' | 'video';
-export type Outbound = { text: string } | { type: MediaType; url: string; caption?: string; filename?: string };
+export type Outbound = { text: string } | { type: MediaType; url: string; caption?: string; filename?: string; mimetype?: string };
 export function object(body: unknown): Record<string, unknown> {
   if (!body || typeof body !== 'object' || Array.isArray(body)) throw new ApiError(400, 'invalid_request', 'Body harus objek JSON');
   return body as Record<string, unknown>;
@@ -32,5 +33,13 @@ export async function sendMedia(manager: SessionManager, id: string, body: unkno
   catch { throw new ApiError(400, 'invalid_request', 'url harus HTTP atau HTTPS'); }
   const caption = input.caption === undefined ? undefined : requiredString(input.caption, 'caption');
   const filename = input.filename === undefined ? undefined : requiredString(input.filename, 'filename', 255);
-  return manager.send(id, jid, { type: type as MediaType, url, caption, filename });
+  manager.connected(id);
+  let file: Awaited<ReturnType<typeof downloadPublicMedia>>;
+  try { file = await downloadPublicMedia(url); }
+  catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(502, 'send_failed', 'Gagal mengunduh media');
+  }
+  try { return await manager.send(id, jid, { type: type as MediaType, url: file.path, mimetype: file.mimetype, caption, filename }); }
+  finally { await file.cleanup(); }
 }

@@ -66,14 +66,14 @@ export function baileysConnector(store: SessionStore): Connector {
       async exists(jid) { return Boolean((await socket.onWhatsApp(jid))?.some(result => result.exists)); },
       async send(jid, content) {
         let outgoing: AnyMessageContent;
-        if ('text' in content) outgoing = content;
+        if ('text' in content) outgoing = { ...content, linkPreview: null };
         else {
           const media = { url: content.url };
           switch (content.type) {
             case 'image': outgoing = { image: media, caption: content.caption }; break;
             case 'video': outgoing = { video: media, caption: content.caption }; break;
-            case 'audio': outgoing = { audio: media, mimetype: 'audio/mpeg' }; break;
-            case 'document': outgoing = { document: media, caption: content.caption, fileName: content.filename ?? 'document', mimetype: 'application/octet-stream' }; break;
+            case 'audio': outgoing = { audio: media, mimetype: content.mimetype ?? 'audio/mpeg' }; break;
+            case 'document': outgoing = { document: media, caption: content.caption, fileName: content.filename ?? 'document', mimetype: content.mimetype ?? 'application/octet-stream' }; break;
           }
         }
         const message = await socket.sendMessage(jid, outgoing);

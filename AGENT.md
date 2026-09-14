@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** validasi URL media keluar
+**Sedang dikerjakan:** retensi media otomatis
 
 **Sudah selesai:**
-- Tahap 1–5; batas body 64 KiB dilindungi tes
+- Tahap 1–5, batas body dan URL media publik tervalidasi
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** validasi URL media keluar
+**Berikutnya:** retensi media otomatis

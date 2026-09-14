@@ -76,7 +76,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
 ## 6. Rapikan
 - [x] Batasi ukuran request body
-- [ ] Validasi URL media keluar
+- [x] Validasi URL media keluar
 - [ ] Hapus media otomatis (`MEDIA_RETENTION_DAYS`)
 - [ ] Log per session
 - [ ] `.env.example` + langkah instal
