@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** auth state per session
+**Sedang dikerjakan:** login QR dan endpoint QR
 
 **Sudah selesai:**
-- Setup proyek dan session manager multi-session
+- Setup, session manager, auth state persisten per session
 
 **Menunggu pemilik:**
 - (belum ada)
 
-**Berikutnya:** auth state per session
+**Berikutnya:** login QR dan endpoint QR

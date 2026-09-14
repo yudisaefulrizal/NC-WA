@@ -1,3 +1,4 @@
+import type { SessionStore } from './store.js';
 export type Status = 'qr_required' | 'connecting' | 'connected' | 'logged_out';
 export interface SessionInfo {
   id: string;
@@ -9,7 +10,7 @@ export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
 }
 export interface Connection {
-  close(): void;
+  close(): void | Promise<void>;
   logout(): Promise<void>;
 }
 export interface Update { status?: Status; phone?: string; qr?: string; disconnected?: number }
@@ -22,7 +23,20 @@ interface Session extends SessionInfo {
 
 export class SessionManager {
   protected sessions = new Map<string, Session>();
-  constructor(protected connect: Connector) {}
+  constructor(protected connect: Connector, protected store?: SessionStore) {}
+  async restore() {
+    for (const info of await this.store?.load() ?? []) {
+      const session: Session = { ...info, qr: null, generation: 0 };
+      this.sessions.set(info.id, session);
+      if (info.status !== 'logged_out') {
+        session.status = 'connecting';
+        await this.open(session);
+      }
+    }
+  }
+  protected persist(session: Session) {
+    return this.store?.save(this.detail(session.id)) ?? Promise.resolve();
+  }
 
   static validateId(id: unknown): asserts id is string {
     if (typeof id !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/.test(id)) {
@@ -44,7 +58,7 @@ export class SessionManager {
     if (this.sessions.has(id)) throw new ApiError(409, 'session_exists', `Session ${id} sudah ada`);
     const session: Session = { id, status: 'connecting', phone: null, filter: 'all', qr: null, generation: 0 };
     this.sessions.set(id, session);
-    try { await this.open(session); }
+    try { await this.persist(session); await this.open(session); }
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
   }
@@ -56,14 +70,16 @@ export class SessionManager {
       if (update.phone) session.phone = update.phone;
       if (update.qr) session.qr = update.qr;
       if (update.status === 'connected' || update.status === 'logged_out') session.qr = null;
+      void this.persist(session).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal menyimpan metadata`));
     });
-    if (generation !== session.generation) connection.close();
+    if (generation !== session.generation) await connection.close();
     else session.connection = connection;
   }
   async stop() {
     for (const session of this.sessions.values()) {
       session.generation++;
-      session.connection?.close();
+      await session.connection?.close();
     }
+    await this.store?.flush();
   }
 }
