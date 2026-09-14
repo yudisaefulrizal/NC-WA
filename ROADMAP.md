@@ -31,9 +31,9 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Queue + jeda antar pesan
 
 **Uji**
-- [agent] Kirim ke session yang belum connected → 409
-- [agent] Body tanpa `to` → 400
-- [agent] Queue benar-benar memberi jeda antar pesan
+- [x] [agent] Kirim ke session yang belum connected → 409
+- [x] [agent] Body tanpa `to` → 400
+- [x] [agent] Queue benar-benar memberi jeda antar pesan
 - [manual] Teks sampai di HP tujuan
 - [manual] Gambar + caption sampai, dokumen bisa dibuka
 - [manual] Kirim ke grup sampai
@@ -46,9 +46,9 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Filter private / group per session
 
 **Uji**
-- [agent] Webhook gagal → retry 3x lalu berhenti
-- [agent] Filter `private` → pesan grup tidak diteruskan
-- [agent] `/media/:id` tanpa API key → 401
+- [x] [agent] Webhook gagal → retry 3x lalu berhenti
+- [x] [agent] Filter `private` → pesan grup tidak diteruskan
+- [x] [agent] `/media/:id` tanpa API key → 401
 - [manual] Kirim dari HP → webhook menerima payload
 - [manual] Kirim gambar dari HP → URL media bisa diunduh
 - [manual] Pesan grup terbaca `isGroup: true` dan `sender` benar
@@ -69,7 +69,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Halaman dokumentasi API
 
 **Uji**
-- [agent] `GET /stats` mengembalikan bentuk yang benar
+- [x] [agent] `GET /stats` mengembalikan bentuk yang benar
 - [manual] Buka dashboard, masukkan API key, list session muncul
 - [manual] Pasang nomor baru lewat UI dari awal sampai connected
 - [manual] Ubah filter lewat UI, cek berubah di `GET /sessions/:id`
@@ -80,16 +80,26 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Hapus media otomatis (`MEDIA_RETENTION_DAYS`)
 - [x] Log per session
 - [x] `.env.example` + langkah instal
-- [ ] README — apa ini, catatan risiko ToS, cara instal,
+- [x] README — apa ini, catatan risiko ToS, cara instal,
       cara pasang nomor pertama, tunjuk ke SPEC.md untuk API
 
 **Uji**
-- [agent] Body melebihi batas → ditolak
-- [agent] URL media ke alamat lokal → ditolak
-- [agent] File media lewat masa retensi → terhapus
+- [x] [agent] Body melebihi batas → ditolak
+- [x] [agent] URL media ke alamat lokal → ditolak
+- [x] [agent] File media lewat masa retensi → terhapus
 - [manual] Instal dari nol di server lain, ikuti README apa adanya
 
 ---
 
 Halaman QR ikut tahap 1 karena dibutuhkan untuk menguji semua tahap
 berikutnya. Sisa UI paling belakang.
+
+## Hasil verifikasi terakhir
+
+- `npm run check`, `npm test` (28 tes), dan `npm run build`: lulus.
+- Browser otomatis dengan data tiruan: daftar session, filter, logout, hapus,
+  dokumentasi dan viewport mobile lulus tanpa error JavaScript.
+- Scan QR dikonfirmasi pemilik; restart engine terbaru terbukti kembali connected.
+- Smoke HTTP server terbaru: dashboard/QR/dokumentasi/statistik 200, API tanpa key 401.
+- Tes manual lain di atas tetap menunggu; belum ada pengiriman pesan nyata
+  atau webhook ke tujuan milik pemilik yang diuji.

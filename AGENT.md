@@ -53,12 +53,14 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** README final dan verifikasi
+**Sedang dikerjakan:** implementasi selesai; menunggu tes manual
 
 **Sudah selesai:**
-- Tahap 1–5, keamanan, retensi, log dan konfigurasi instalasi
+- Seluruh implementasi tahap 1–6; 28 tes, build, dan uji browser lolos
+- Server terbaru aktif; toko-a tetap connected setelah restart
 
 **Menunggu pemilik:**
-- Uji putus jaringan dan pencabutan device dari HP
+- Uji jaringan/device, kirim teks/media/grup, webhook dan presence
+- Uji dashboard dengan HP serta instalasi bersih di server lain
 
-**Berikutnya:** README final dan verifikasi
+**Berikutnya:** uji manual pengiriman, webhook, presence, dan instalasi

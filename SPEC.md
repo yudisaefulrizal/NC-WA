@@ -4,46 +4,46 @@ Engine di atas Baileys. REST API + webhook. Multi-session.
 Broadcast/kontak/jadwal → urusan aplikasi pemakai.
 
 ## Session
-- [ ] Multi-session (beberapa nomor)
-- [ ] Login QR
-- [ ] Logout
-- [ ] Hapus session
-- [ ] List session + status
-- [ ] Reconnect otomatis
+- [x] Multi-session (beberapa nomor)
+- [x] Login QR
+- [x] Logout
+- [x] Hapus session
+- [x] List session + status
+- [x] Reconnect otomatis
 
 ## Kirim
-- [ ] Teks
-- [ ] Media + caption
-- [ ] Ke pribadi
-- [ ] Ke grup
+- [x] Teks
+- [x] Media + caption
+- [x] Ke pribadi
+- [x] Ke grup
 
 ## Terima
-- [ ] Tangkap pesan masuk
-- [ ] Webhook ke aplikasi pemakai
-- [ ] Webhook status session
-- [ ] Retry webhook kalau gagal
+- [x] Tangkap pesan masuk
+- [x] Webhook ke aplikasi pemakai
+- [x] Webhook status session
+- [x] Retry webhook kalau gagal
 
 ## Presence
-- [ ] Tandai dibaca
-- [ ] Sedang mengetik
+- [x] Tandai dibaca
+- [x] Sedang mengetik
 
 ## Infra
-- [ ] Auth state persisten
-- [ ] Queue kirim + jeda
-- [ ] API key
-- [ ] Log kejadian sistem ke stdout
-- [ ] Simpan media masuk ke disk
-- [ ] Hapus media otomatis (`MEDIA_RETENTION_DAYS`, default 7)
+- [x] Auth state persisten
+- [x] Queue kirim + jeda
+- [x] API key
+- [x] Log kejadian sistem ke stdout
+- [x] Simpan media masuk ke disk
+- [x] Hapus media otomatis (`MEDIA_RETENTION_DAYS`, default 7)
 
 ## UI
 Dashboard internal, satu pemilik, dibuka pakai API key dari env.
 
-- [ ] List session + status
-- [ ] Buat session, tampilkan QR di layar
-- [ ] Logout / hapus session
-- [ ] Halaman dokumentasi API
-- [ ] Statistik (dibaca saat UI dibuka, tidak disimpan)
-- [ ] Atur filter pribadi / grup per session
+- [x] List session + status
+- [x] Buat session, tampilkan QR di layar
+- [x] Logout / hapus session
+- [x] Halaman dokumentasi API
+- [x] Statistik (dibaca saat UI dibuka, tidak disimpan)
+- [x] Atur filter pribadi / grup per session
 
 Tanpa user, tanpa login, tanpa manajemen key.
 Satu instalasi = satu pemilik. Orang lain instal sendiri.
@@ -104,11 +104,11 @@ logika bisnis: cuma menjalankan perintah per satu pesan.
 
 ## Keamanan
 
-- [ ] `/media/:messageId` wajib API key — isinya foto/dokumen orang,
+- [x] `/media/:messageId` wajib API key — isinya foto/dokumen orang,
       `messageId` sulit ditebak tapi itu bukan kontrol akses
-- [ ] Batasi ukuran request body — tanpa batas, satu POST besar bisa
+- [x] Batasi ukuran request body — tanpa batas, satu POST besar bisa
       menghabiskan memori
-- [ ] Validasi URL media keluar — wajib http/https, tolak alamat lokal,
+- [x] Validasi URL media keluar — wajib http/https, tolak alamat lokal,
       supaya engine tidak bisa disuruh mengambil alamat internal server
 
 Tanpa rate limiting: satu pemilik, satu key, dan queue sudah membatasi laju.
@@ -172,6 +172,10 @@ Client mencocokkan `error`, bukan `message`. Teks `message` bisa berubah.
 | `media_not_found` | 404 | File sudah kedaluwarsa atau tidak ada |
 | `send_failed` | 502 | Gagal kirim ke WhatsApp |
 
+Tambahan error implementasi: `logout_failed` (502), `queue_full` (503),
+`unavailable` (503), `not_found` (404), dan `internal_error` (500).
+Body di atas 64 KiB ditolak 413 dengan `invalid_request`.
+
 Berhasil selalu 200. Yang bisa dicoba ulang: `session_not_connected`,
 `send_failed`.
 
@@ -187,6 +191,9 @@ Berhasil selalu 200. Yang bisa dicoba ulang: `session_not_connected`,
 ```json
 { "id": "toko-a", "status": "qr_required" }
 ```
+
+Respons awal boleh `connecting` saat QR belum tersedia. Poll endpoint QR
+untuk menunggu QR atau status connected.
 
 ### Ambil QR
 `GET /sessions/toko-a/qr`
@@ -322,6 +329,9 @@ Ke grup — `to` diisi id grup:
 { "ok": true }
 ```
 
+Untuk grup yang kunci pesannya belum dikenal setelah restart, tambahkan
+`sender` berupa nomor pengirim atau JID LID.
+
 ### Sedang mengetik
 `POST /sessions/toko-a/typing`
 ```json
@@ -340,7 +350,8 @@ sering tidak muncul di HP penerima kalau nomornya terlihat offline.
 
 ## Media masuk
 
-`GET /media/:messageId` → file aslinya. Wajib `X-API-Key`.
+`GET /media/:id` → file aslinya. ID dibentuk dari sessionId + messageId;
+gunakan URL yang dikembalikan webhook. Wajib `X-API-Key`.
 
 Media masuk disimpan engine ke disk, webhook cuma kirim URL-nya.
 Bukan base64 — video besar boros memori, dan memori lebih mahal daripada disk.
@@ -382,6 +393,9 @@ Kalau media:
 ```
 
 `type`: `text` | `image` | `document` | `audio` | `video`
+
+Jika WhatsApp hanya memberikan LID tanpa nomor alternatif, `from`/`sender`
+mempertahankan akhiran `@lid`. Endpoint read menerima alamat LID tersebut.
 
 ### Status session berubah
 ```json

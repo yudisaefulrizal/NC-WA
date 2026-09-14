@@ -1,55 +1,114 @@
 # NC-WA
 
-Engine WhatsApp multi-session berbasis TypeScript, Express, dan Baileys.
-Saat ini tahap 1: pemasangan QR, auth persisten, CRUD session, logout,
-reconnect otomatis, dan API key. API pengiriman belum tersedia.
+Gateway WhatsApp multi-session berbasis TypeScript, Express, dan Baileys.
+Satu proses menyediakan REST API, webhook, dan dashboard HTML/JS tanpa framework.
+Tanpa database, akun pengguna, atau logika broadcast/jadwal.
 
-## Menjalankan
+Fitur: QR dan auth persisten per nomor, reconnect, teks/media ke pribadi atau
+grup, antrean kirim, webhook pesan/status/QR, filter, receipt dibaca, presence,
+media masuk di disk, statistik, dan dokumentasi API di `/docs.html`.
 
-Butuh Node.js 22 atau lebih baru. Jalankan satu proses saja.
+## Instalasi
+
+Butuh Node.js 22 atau lebih baru dan akses jaringan ke WhatsApp. Gunakan satu
+proses saja: jangan memakai PM2 cluster atau berbagi folder auth antar engine.
 
 ```sh
 npm ci
 cp .env.example .env
+openssl rand -hex 32
 ```
 
-Isi `API_KEY` di `.env` dengan key acak milik sendiri, misalnya hasil
-`openssl rand -hex 32`. Jangan bagikan key atau folder `auth/`.
+Isi `API_KEY` di `.env` dengan hasil perintah terakhir. Jangan commit atau
+membagikan `.env` dan folder auth; keduanya sudah masuk `.gitignore`.
 
 ```sh
 npm run build
 npm start
 ```
 
-Buka http://127.0.0.1:8066, masukkan API key yang sama dan ID session,
-lalu klik **Buat / buka session**. Pindai QR dari menu **Perangkat tertaut**
-di WhatsApp HP. Halaman memperbarui QR setiap 2 detik.
+Buka http://127.0.0.1:8066 dan masukkan API key tersebut. Klik **Pasangkan nomor**,
+isi ID session, lalu scan QR melalui WhatsApp HP → **Perangkat tertaut** →
+**Tautkan perangkat**. Tunggu sampai status **Tersambung**. QR otomatis diperbarui.
 
-Default server hanya mendengarkan localhost. Jika diakses lewat internet,
-gunakan reverse proxy HTTPS. Folder `AUTH_DIR` harus permanen saat redeploy.
-Jangan menjalankan dua engine pada folder auth yang sama.
+Untuk pengembangan: `npm run dev`. Setelah perubahan kode produksi, jalankan
+`npm run build` dan restart `npm start`. Ctrl+C menghentikan socket dan menyimpan
+kredensial; restart memakai auth sebelumnya tanpa scan ulang.
 
-## Uji manual tahap 1
+## Konfigurasi
 
-1. Pindai QR sampai halaman menunjukkan **WhatsApp tersambung**.
-2. Hentikan engine dengan Ctrl+C, jalankan `npm start` kembali, lalu buka
-   session yang sama. Pastikan tetap connected tanpa scan ulang.
-3. Putuskan jaringan engine lalu pulihkan. Pastikan reconnect otomatis.
-4. Hapus perangkat tertaut dari HP. Pastikan status menjadi `logged_out`
-   dan engine tidak terus mencoba reconnect.
+| Env | Default | Kegunaan |
+| --- | --- | --- |
+| `API_KEY` | wajib diisi | Header `X-API-Key` untuk seluruh API |
+| `PORT` | `8066` | Port HTTP |
+| `HOST` | `127.0.0.1` | Alamat listen, localhost secara default |
+| `AUTH_DIR` | `./auth` | Auth dan metadata session, harus permanen |
+| `MEDIA_DIR` | `./data/media` | File media masuk, harus permanen |
+| `MEDIA_RETENTION_DAYS` | `7` | Usia media sebelum dihapus |
+| `WEBHOOK_URL` | kosong | Tujuan POST webhook; kosong menonaktifkan webhook |
+| `BASE_URL` | `http://127.0.0.1:8066` | Origin engine yang dapat dijangkau penerima webhook |
+| `SEND_INTERVAL_MS` | `1000` | Jeda setelah pengiriman selesai, per session |
 
-Dua langkah pertama merupakan gerbang sebelum tahap 2. Laporkan hasilnya
-agar pengiriman pesan dapat dilanjutkan. Mematikan Wi-Fi HP saja mungkin
-masih menyisakan jaringan seluler; uji putus jaringan engine untuk reconnect.
+BASE_URL harus berupa origin tanpa path atau query. Contoh:
+`https://wa.example.com`. Jika mengubah port, sesuaikan BASE_URL di `.env`.
+Jika dibuka melalui internet, gunakan reverse proxy HTTPS. API key disimpan
+browser di localStorage sesuai spesifikasi; gunakan browser/perangkat tepercaya.
 
-Endpoint yang tersedia: `POST /sessions`, `GET /sessions`,
-`GET /sessions/:id`, `GET /sessions/:id/qr`,
-`POST /sessions/:id/logout`, `DELETE /sessions/:id`.
-Semua membutuhkan header `X-API-Key`. Detail kontrak ada di [SPEC.md](SPEC.md).
-Pembuatan session bisa membalas `connecting` selagi QR disiapkan.
-Session yang logged out harus dihapus lalu dibuat ulang untuk scan kembali.
-DELETE menutup koneksi dan menghapus data lokal; gunakan logout dahulu
-jika ingin sekaligus mencabut perangkat tertaut di HP.
+Jika memakai container, petakan AUTH_DIR dan MEDIA_DIR sebagai volume. Backup
+kedua direktori dan `.env` secara privat; jangan menimpanya saat redeploy.
+Auth berbasis file mengikuti `useMultiFileAuthState`, sesuai kebutuhan satu proses.
+
+## REST API
+
+Kontrak lengkap: [SPEC.md](SPEC.md), atau [halaman dokumentasi lokal](http://127.0.0.1:8066/docs.html).
+Header `X-API-Key` wajib, termasuk untuk mengunduh media. Jangan taruh key di URL.
+
+```sh
+curl http://127.0.0.1:8066/sessions \
+  -H 'X-API-Key: KEY_ANDA'
+
+curl http://127.0.0.1:8066/sessions/toko-a/messages/text \
+  -H 'X-API-Key: KEY_ANDA' -H 'Content-Type: application/json' \
+  -d '{"to":"628123456789","text":"Halo"}'
+```
+
+Nomor ditulis internasional tanpa `+`; tujuan grup memakai JID `...@g.us`.
+Body dibatasi 64 KiB. URL media harus HTTP/HTTPS publik; IP lokal, redirect
+internal, serta perubahan DNS tidak dapat dipakai untuk menjangkau server lokal.
+Unduhan media dibatasi 32 MiB dan dialirkan ke disk sementara.
+
+Request kirim menunggu antrean dan respons WhatsApp. Respons 200 berarti
+WhatsApp menerima pengiriman, bukan bukti pesan sudah dibaca di HP. Antrean
+maksimal 256 pekerjaan per session; penuh menghasilkan 503 `queue_full`.
+Jangan otomatis mengulang request timeout karena pesan mungkin sudah terkirim.
+
+Logout mencabut device di WhatsApp. DELETE menutup socket dan menghapus auth
+lokal; logout dahulu jika ingin sekaligus mencabut perangkat dari HP.
+Session logged_out harus dihapus lalu dibuat ulang untuk scan kembali.
+
+## Webhook dan media masuk
+
+Isi WEBHOOK_URL dengan endpoint aplikasi pemakai. Event: `message`,
+`session.status`, `session.qr`. Webhook gagal dicoba ulang 3 kali dengan jeda
+1, 2, 4 detik; timeout tiap percobaan 10 detik. Redirect webhook tidak diikuti.
+Retry dan statistik hanya ada di memori; restart tidak mengulang event yang
+belum selesai. Penerima sebaiknya idempoten berdasarkan sessionId + messageId.
+
+Filter `all`, `private`, atau `group` tersimpan per session. Pesan sendiri,
+riwayat sinkronisasi, status broadcast, dan newsletter tidak diteruskan.
+Pesan grup membawa groupId dan sender. Pada akun dengan alamat LID, engine
+menggunakan nomor alternatif jika tersedia; bila belum tersedia, akhiran
+`@lid` dipertahankan agar tidak disalahartikan sebagai nomor telepon.
+
+Media masuk disimpan di disk; webhook membawa URL beserta mimetype, bukan
+base64. ID media memisahkan session untuk mencegah benturan messageId.
+Gunakan URL persis dari webhook untuk mengunduh dengan API key. Media yang
+sudah kedaluwarsa menghasilkan 404; pembersihan berlangsung saat startup dan
+setiap jam. Statistik `received` menghitung pesan yang dikenali sebelum filter.
+
+Tidak ada isi pesan atau kredensial dalam log aplikasi. Log sistem memakai
+stdout dengan timestamp dan ID session; log detail library yang bisa membawa
+kredensial dinonaktifkan.
 
 ## Pemeriksaan
 
@@ -59,11 +118,29 @@ npm test
 npm run build
 ```
 
-Tes otomatis menggunakan socket tiruan, tanpa menghubungkan nomor nyata.
-Untuk pemeriksaan opsional QR melalui jaringan WhatsApp, jalankan
-`node scripts/check-qr.mjs` setelah build. Tidak perlu scan; data sementara
-dihapus setelah pemeriksaan.
-Baileys merupakan integrasi WhatsApp tidak resmi; pemakaian dapat melanggar
-ketentuan WhatsApp dan berisiko pembatasan akun.
+Tes otomatis memakai socket dan webhook tiruan. Untuk pemeriksaan opsional
+QR lewat jaringan WhatsApp (tanpa scan akun), jalankan setelah build:
 
-Panduan kerja: [AGENT.md](AGENT.md). Progres: [ROADMAP.md](ROADMAP.md).
+```sh
+node scripts/check-qr.mjs
+```
+
+Pemeriksaan HP yang tetap diperlukan:
+
+1. Scan lalu restart engine tanpa scan ulang — sudah berhasil pada session `toko-a`.
+2. Putuskan jaringan engine lalu pulihkan; pastikan reconnect. Cabut device
+   melalui HP untuk memeriksa `logged_out` tanpa loop reconnect.
+3. Uji teks, gambar/caption, dokumen, dan tujuan grup dengan nomor yang ditentukan.
+4. Uji webhook teks/media/grup, receipt dibaca, dan indikator mengetik dari HP.
+5. Uji pemasangan nomor baru dan filter melalui dashboard, lalu instal dari nol
+   pada server lain dengan panduan ini.
+
+Checklist terperinci ada di [ROADMAP.md](ROADMAP.md); tes yang belum dilakukan
+belum ditandai lulus. Panduan kerja: [AGENT.md](AGENT.md).
+
+## Catatan penggunaan
+
+Baileys adalah integrasi WhatsApp tidak resmi. Pemakaian dapat melanggar
+ketentuan WhatsApp dan berisiko pembatasan akun. Gunakan secara bertanggung
+jawab dan hanya kirim pesan kepada tujuan yang mengizinkan komunikasi.
+Referensi library: [WhiskeySockets/Baileys](https://github.com/WhiskeySockets/Baileys).
