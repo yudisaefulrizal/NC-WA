@@ -11,6 +11,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.put('/sessions/:id/filter', async (req, res) => res.json(await manager.setFilter(req.params.id, req.body?.filter)));
   app.get('/media/:id', async (req, res) => {
     if (!media) throw new ApiError(404, 'media_not_found', 'Media tidak ada');
     const file = await media.get(req.params.id);

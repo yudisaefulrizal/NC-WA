@@ -83,6 +83,15 @@ export class SessionManager {
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
   }
+  async setFilter(id: string, filter: unknown) {
+    if (filter !== 'all' && filter !== 'private' && filter !== 'group') throw new ApiError(400, 'invalid_request', 'filter harus all, private, atau group');
+    return this.mutate(id, async session => {
+      const previous = session.filter;
+      session.filter = filter;
+      try { await this.persist(session); } catch (error) { session.filter = previous; throw error; }
+      return { id, filter };
+    });
+  }
   connected(id: string) {
     const session = this.get(id);
     if (this.stopped || session.suspended || session.status !== 'connected' || !session.connection) {
@@ -172,6 +181,7 @@ export class SessionManager {
     const connection = await this.connect(session.id, update => {
       if (this.sessions.get(session.id) !== session || generation !== session.generation) return;
       if (update.incoming) {
+        if ((session.filter === 'private' && update.incoming.isGroup) || (session.filter === 'group' && !update.incoming.isGroup)) return;
         void this.onIncoming?.(this.detail(session.id), update.incoming).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal memproses pesan masuk`));
         return;
       }

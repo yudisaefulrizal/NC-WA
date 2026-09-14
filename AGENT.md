@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 3 — Terima
-**Sedang dikerjakan:** filter pribadi dan grup
+**Sedang dikerjakan:** tandai pesan dibaca
 
 **Sudah selesai:**
-- Tahap 1–2, webhook dan media masuk tersimpan aman
+- Tahap 1–3 diimplementasikan, termasuk filter persisten
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** filter pribadi dan grup
+**Berikutnya:** tandai pesan dibaca
