@@ -49,16 +49,33 @@ function render(sessions) {
     const actions = document.createElement('div'); actions.className = 'actions';
     const link = document.createElement('a'); link.href = `/qr.html?session=${encodeURIComponent(session.id)}`; link.textContent = 'Buka QR';
     if (session.status !== 'connected' && session.status !== 'logged_out') actions.append(link);
-    for (const [action, label] of [['logout', 'Logout'], ['delete', 'Hapus']]) {
+    for (const [action, label] of [['reconnect', 'Pasang ulang'], ['logout', 'Logout'], ['delete', 'Hapus']]) {
       if (action === 'logout' && session.status === 'logged_out') continue;
+      if (action === 'reconnect' && session.status !== 'logged_out') continue;
       const button = document.createElement('button');
       button.type = 'button'; button.className = action === 'delete' ? 'danger' : 'secondary'; button.textContent = label;
+      // Hapus saat tersambung meninggalkan perangkat menggantung di HP; status lain aman dibuang.
+      if (action === 'delete' && session.status === 'connected') {
+        button.disabled = true;
+        button.title = 'Logout dahulu agar perangkat tercabut dari HP';
+      }
       button.addEventListener('click', async () => {
-        const prompt = action === 'delete' ? `Hapus session ${session.id} beserta data login lokal? Untuk mencabut perangkat di HP, lakukan logout terlebih dahulu.` : `Logout WhatsApp untuk session ${session.id}?`;
+        // Hapus pada session yang masih tertaut meninggalkan perangkat menggantung di HP.
+        const linked = action === 'delete' && session.status !== 'logged_out';
+        const prompt = action === 'reconnect'
+          ? `Pasang ulang session ${session.id}? Anda akan diminta memindai QR baru.`
+          : action === 'logout'
+          ? `Logout WhatsApp untuk session ${session.id}?`
+          : linked
+            ? `Session ${session.id} masih tertaut.\n\nMenghapus sekarang membuat perangkat tetap ada di HP dan harus dicabut manual lewat WhatsApp > Perangkat tertaut.\n\nLogout dahulu agar tercabut otomatis. Tetap hapus?`
+            : `Hapus session ${session.id} beserta data login lokal?`;
         if (!confirm(prompt)) return;
         button.disabled = true;
         try {
-          await api(`/sessions/${encodeURIComponent(session.id)}${action === 'logout' ? '/logout' : ''}`, { method: action === 'logout' ? 'POST' : 'DELETE' });
+          const path = action === 'delete' ? '' : `/${action}`;
+          await api(`/sessions/${encodeURIComponent(session.id)}${path}`, { method: action === 'delete' ? 'DELETE' : 'POST' });
+          // QR baru hanya berlaku sebentar, jadi antar langsung ke halamannya.
+          if (action === 'reconnect') { location.href = link.href; return; }
           signature = ''; await refresh();
         } catch (error) { notice.textContent = error.message; }
         finally { button.disabled = false; }

@@ -56,16 +56,14 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 **Sedang dikerjakan:** uji manual bersama pemilik
 
 **Sudah selesai:**
-- Implementasi tahap 1–6; 28 tes, build, dan tipe lolos
-- Tahap 1 tuntas: restart, reconnect, logout setelah device dihapus
-- Tahap 2 tuntas: teks, gambar + caption, dokumen, kirim ke grup
-- Tahap 3 tuntas: webhook pesan masuk & status, pesan grup terbaca benar,
-  media masuk hanya bisa diunduh dengan API key, filter terbukti
-  menyaring grup saat `private` dan meneruskan lagi saat `all`
-- Tahap 4 tuntas: centang biru dan indikator mengetik terlihat di HP
+- Implementasi tahap 1–6; 30 tes, build, dan tipe lolos
+- Tahap 1–4 tuntas diuji dengan WhatsApp nyata: reconnect, logout,
+  teks, media, grup, webhook, filter, read, typing
+- Dashboard: logout, hapus, dan pasang ulang session terbukti jalan
 
 **Menunggu pemilik** (panduan: [UJI-MANUAL.md](UJI-MANUAL.md)):
-- Dashboard di browser (3 uji)
+- Pasang nomor baru lewat UI sampai connected
+- Ubah filter lewat UI
 - Instalasi bersih di server lain
 
-**Berikutnya:** uji dashboard, lalu deploy
+**Berikutnya:** sisa uji dashboard, lalu deploy

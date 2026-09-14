@@ -35,7 +35,7 @@ form.addEventListener('submit', async event => {
           connected: 'WhatsApp tersambung. Session siap digunakan.',
           qr_required: 'Pindai QR dari HP Anda.',
           connecting: 'Menghubungkan ke WhatsApp…',
-          logged_out: 'Session sudah logout. Hapus session lewat API lalu buat ulang untuk memasangkan lagi.',
+          logged_out: 'Session sudah logout. Tekan Pasang ulang di dashboard untuk memindai QR baru.',
         }[result.status] || result.status;
         if (result.status === 'connected' || result.status === 'logged_out') return;
       } catch (error) {

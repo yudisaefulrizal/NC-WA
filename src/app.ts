@@ -41,6 +41,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.get('/sessions', (_req, res) => res.json(manager.list().map(({ id, status, phone }) => ({ id, status, phone }))));
   app.get('/sessions/:id', (req, res) => res.json(manager.detail(req.params.id)));
   app.post('/sessions/:id/logout', async (req, res) => res.json(await manager.logout(req.params.id)));
+  app.post('/sessions/:id/reconnect', async (req, res) => res.json(await manager.reconnect(req.params.id)));
   app.delete('/sessions/:id', async (req, res) => res.json(await manager.remove(req.params.id)));
   app.get('/sessions/:id/qr', (req, res) => res.json(manager.qr(req.params.id)));
   app.use((_req, _res, next) => next(new ApiError(404, 'not_found', 'Endpoint tidak ada')));

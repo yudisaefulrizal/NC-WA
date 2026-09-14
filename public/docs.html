@@ -13,9 +13,10 @@
 <tr><td><code>GET /sessions/:id</code></td><td>id, status, phone, filter</td></tr>
 <tr><td><code>GET /sessions/:id/qr</code></td><td>status dan qr (data URL PNG atau null); polling setiap 2 detik hingga connected</td></tr>
 <tr><td><code>POST /sessions/:id/logout</code></td><td>id dan status logged_out</td></tr>
+<tr><td><code>POST /sessions/:id/reconnect</code></td><td>id dan status connecting; hanya untuk session logged_out. Auth lama dibuang, QR baru terbit, id dan filter tetap.</td></tr>
 <tr><td><code>DELETE /sessions/:id</code></td><td><code>{"deleted":true}</code>; hapus auth lokal. Logout dahulu untuk mencabut device dari HP.</td></tr>
 <tr><td><code>PUT /sessions/:id/filter</code></td><td><code>{"filter":"all"}</code>; pilihan all, private, group; tersimpan saat restart</td></tr>
-</tbody></table></div><p>Status: <code>connecting</code>, <code>qr_required</code>, <code>connected</code>, <code>logged_out</code>. Hapus lalu buat ulang session logged_out untuk memasangkan kembali.</p></section>
+</tbody></table></div><p>Status: <code>connecting</code>, <code>qr_required</code>, <code>connected</code>, <code>logged_out</code>. Pasang ulang session logged_out lewat <code>POST /sessions/:id/reconnect</code>.</p></section>
 <section class="panel"><h2>Kirim teks dan media</h2><p>Request menunggu antrean dan hasil pengiriman ke WhatsApp. Respons 200 bukan bukti pesan sudah dibaca atau diterima HP tujuan. Jeda default 1 detik setelah pengiriman sebelumnya selesai, per session.</p><pre><code>POST /sessions/toko-a/messages/text
 {"to":"628123456789","text":"Halo"}
 

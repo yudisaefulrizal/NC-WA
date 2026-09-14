@@ -56,6 +56,34 @@ test('logout menutup koneksi dan hapus membebaskan ID', async () => {
   assert.equal((await authorized(app).post('/sessions').send({ id: 'a' })).status, 200);
 });
 
+test('pasang ulang membuka koneksi baru dan mempertahankan filter', async () => {
+  let dibuka = 0;
+  const manager = new SessionManager(async (_id, update) => {
+    dibuka++;
+    update({ status: 'connected', phone: '628123' });
+    return { close() {}, async logout() {} };
+  });
+  const app = createApp(manager, 'test-key');
+  await authorized(app).post('/sessions').send({ id: 'a' });
+  await request(app).put('/sessions/a/filter').set('X-API-Key', 'test-key').send({ filter: 'private' });
+  // Sebelum logout, pasang ulang tidak masuk akal.
+  const ditolak = await authorized(app).post('/sessions/a/reconnect');
+  assert.equal(ditolak.status, 409);
+  assert.equal(ditolak.body.error, 'session_not_connected');
+
+  await authorized(app).post('/sessions/a/logout');
+  assert.equal(dibuka, 1);
+  assert.equal((await authorized(app).post('/sessions/a/reconnect')).status, 200);
+  assert.equal(dibuka, 2);
+  // ID dan filter bertahan; hanya kredensial yang dibuang.
+  assert.equal((await authorized(app).get('/sessions/a')).body.filter, 'private');
+});
+test('pasang ulang butuh API key dan session yang ada', async () => {
+  const { app } = fixture();
+  assert.equal((await request(app).post('/sessions/a/reconnect')).status, 401);
+  assert.equal((await authorized(app).post('/sessions/tidak-ada/reconnect')).status, 404);
+});
+
 test('putus biasa reconnect; event socket lama dan loggedOut tidak reconnect', async () => {
   const updates: Array<(event: import('../src/sessions.js').Update) => void> = [];
   const manager = new SessionManager(async (_id, update) => {

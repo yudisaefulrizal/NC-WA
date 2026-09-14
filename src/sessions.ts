@@ -190,6 +190,30 @@ export class SessionManager {
       return { id, status: session.status };
     });
   }
+  async reconnect(id: string) {
+    return this.mutate(id, async session => {
+      if (session.status !== 'logged_out') {
+        throw new ApiError(409, 'session_not_connected', `Session ${id} bukan logged_out; logout dahulu untuk memasang ulang`);
+      }
+      if (this.stopped) throw new ApiError(503, 'unavailable', 'Engine sedang berhenti');
+      clearTimeout(session.retry);
+      this.queues.get(session)?.close();
+      session.generation++;
+      await session.opening?.catch(() => {});
+      await session.connection?.close();
+      session.connection = undefined;
+      // Kredensial lama sudah dicabut WhatsApp; mulai dari nol agar QR baru terbit.
+      await this.store?.remove(id);
+      session.suspended = false;
+      session.phone = null;
+      session.qr = null;
+      this.status(session, 'connecting', 'pasang ulang');
+      await this.persist(session);
+      session.opening = this.open(session).catch(() => this.schedule(session));
+      await session.opening;
+      return { id, status: session.status };
+    });
+  }
   async remove(id: string) {
     return this.mutate(id, async session => {
       session.suspended = true;

@@ -239,6 +239,16 @@ tidak kehilangan jejak tepat setelah scan.
 { "id": "toko-a", "status": "logged_out" }
 ```
 
+### Pasang ulang
+`POST /sessions/toko-a/reconnect`
+```json
+{ "id": "toko-a", "status": "connecting" }
+```
+
+Hanya untuk session `logged_out`. Auth state lama dibuang, koneksi baru
+dimulai, QR dikeluarkan lagi — id dan filter session tetap. Status lain
+ditolak `409 session_not_connected`.
+
 ### Hapus session
 `DELETE /sessions/toko-a`
 ```json
