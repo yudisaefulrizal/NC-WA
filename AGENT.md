@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 2 — Kirim
-**Sedang dikerjakan:** queue dan jeda antar pesan
+**Sedang dikerjakan:** tangkap pesan masuk
 
 **Sudah selesai:**
-- Tahap 1, pengiriman teks/media ke pribadi dan grup
+- Tahap 1–2 diimplementasikan; kirim teks/media, grup/pribadi, queue
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** queue dan jeda antar pesan
+**Berikutnya:** tangkap pesan masuk

@@ -1,3 +1,4 @@
+import { SendQueue } from './queue.js';
 import type { Outbound } from './messages.js';
 import type { SessionStore } from './store.js';
 export type Status = 'qr_required' | 'connecting' | 'connected' | 'logged_out';
@@ -32,7 +33,8 @@ interface Session extends SessionInfo {
 export class SessionManager {
   protected sessions = new Map<string, Session>();
   private stopped = false;
-  constructor(protected connect: Connector, protected store?: SessionStore, private retryBaseMs = 1000) {}
+  private queues = new WeakMap<Session, SendQueue>();
+  constructor(protected connect: Connector, protected store?: SessionStore, private retryBaseMs = 1000, private sendIntervalMs = 1000) {}
   async restore() {
     for (const info of await this.store?.load() ?? []) {
       const session: Session = { ...info, qr: null, generation: 0 };
@@ -86,6 +88,16 @@ export class SessionManager {
     return session.connection;
   }
   async send(id: string, jid: string, content: Outbound) {
+    this.connected(id);
+    const session = this.get(id);
+    let queue = this.queues.get(session);
+    if (!queue) { queue = new SendQueue(this.sendIntervalMs); this.queues.set(session, queue); }
+    return queue.run(() => {
+      if (this.sessions.get(id) !== session) throw new ApiError(409, 'session_not_connected', 'Session sudah diganti');
+      return this.sendNow(id, jid, content);
+    });
+  }
+  private async sendNow(id: string, jid: string, content: Outbound) {
     const connection = this.connected(id);
     try {
       if (!jid.endsWith('@g.us') && connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
@@ -122,6 +134,7 @@ export class SessionManager {
           if (session.status === 'connecting') this.schedule(session);
           throw new ApiError(502, 'logout_failed', 'Logout gagal; coba lagi setelah koneksi pulih');
         }
+        this.queues.get(session)?.close();
         session.generation++;
         await session.connection?.close();
         session.connection = undefined;
@@ -137,6 +150,7 @@ export class SessionManager {
     return this.mutate(id, async session => {
       session.suspended = true;
       clearTimeout(session.retry);
+      this.queues.get(session)?.close();
       session.generation++;
       await session.opening?.catch(() => {});
       await session.connection?.close();
@@ -205,6 +219,7 @@ export class SessionManager {
     for (const session of this.sessions.values()) {
       session.suspended = true;
       clearTimeout(session.retry);
+      this.queues.get(session)?.close();
       session.generation++;
     }
     for (const session of this.sessions.values()) {

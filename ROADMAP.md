@@ -28,7 +28,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Kirim teks
 - [x] Kirim media + caption
 - [x] Ke pribadi dan grup
-- [ ] Queue + jeda antar pesan
+- [x] Queue + jeda antar pesan
 
 **Uji**
 - [agent] Kirim ke session yang belum connected → 409
