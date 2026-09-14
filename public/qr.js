@@ -49,3 +49,9 @@ form.addEventListener('submit', async event => {
     await poll();
   } catch (error) { if (current === generation) statusEl.textContent = error.message; }
 });
+
+const selectedSession = new URLSearchParams(location.search).get('session');
+if (selectedSession) {
+  idInput.value = selectedSession;
+  if (keyInput.value) form.requestSubmit();
+}

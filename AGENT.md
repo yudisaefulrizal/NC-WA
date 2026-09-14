@@ -52,13 +52,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 4 — Presence
-**Sedang dikerjakan:** dashboard daftar session
+**Tahap:** 5 — UI
+**Sedang dikerjakan:** aksi buat, logout, dan hapus di dashboard
 
 **Sudah selesai:**
-- Tahap 1–4 diimplementasikan
+- Tahap 1–4 dan dashboard status session
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** dashboard daftar session
+**Berikutnya:** aksi buat, logout, dan hapus di dashboard

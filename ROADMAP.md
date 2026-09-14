@@ -62,7 +62,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [manual] Typing → indikator "sedang mengetik" terlihat di HP tujuan
 
 ## 5. UI
-- [ ] List session + status
+- [x] List session + status
 - [ ] Buat session, logout, hapus
 - [ ] Atur filter
 - [ ] Statistik + `GET /stats`

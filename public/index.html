@@ -2,25 +2,26 @@
 <html lang="id">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NC-WA — Pasangkan WhatsApp</title>
-  <link rel="stylesheet" href="/style.css">
-  <script src="/qr.js" defer></script>
+  <title>NC-WA — Dashboard</title>
+  <link rel="icon" href="/logo.png"><link rel="stylesheet" href="/style.css">
+  <script src="/dashboard.js" defer></script>
 </head>
 <body>
-  <main>
-    <p class="brand">NC-WA</p>
-    <h1>Pasangkan WhatsApp</h1>
-    <p>Buka WhatsApp di HP → Perangkat tertaut → Tautkan perangkat, lalu pindai QR di bawah.</p>
-    <form id="pair-form">
-      <label for="api-key">API key</label>
-      <input id="api-key" type="password" autocomplete="off" required>
-      <label for="session-id">ID session</label>
-      <input id="session-id" value="toko-a" pattern="[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}" maxlength="64" required>
-      <button type="submit">Buat / buka session</button>
-    </form>
-    <p id="status" role="status" aria-live="polite">Masukkan API key untuk memulai.</p>
-    <img id="qr" alt="QR untuk menautkan WhatsApp" width="280" height="280" hidden>
-    <p class="hint">QR diperbarui otomatis setiap 2 detik. Setelah terhubung, halaman ini bisa ditutup.</p>
+  <header class="topbar">
+    <a class="identity" href="/"><img src="/logo.png" alt="" width="42" height="42"><span>NC-WA <small>WHATSAPP GATEWAY</small></span></a>
+    <nav aria-label="Navigasi utama"><a class="active" href="/">Session</a><a href="/docs.html">Dokumentasi API</a></nav>
+    <span class="engine-label"><i></i> Satu engine, banyak koneksi</span>
+  </header>
+  <main class="dashboard">
+    <section class="heading"><div><p class="eyebrow">RUANG KERJA</p><h1>Session WhatsApp</h1><p class="muted">Kelola nomor dan koneksi WhatsApp Anda dari satu tempat.</p></div><a class="button" href="/qr.html">+ Pasangkan nomor</a></section>
+    <form id="access-form" class="access panel"><div><label for="api-key">API key</label><p class="muted">Gunakan key dari konfigurasi engine Anda.</p></div><input id="api-key" type="password" autocomplete="off" placeholder="Masukkan API key" required><button type="submit">Buka dashboard</button></form>
+    <p id="notice" role="status" aria-live="polite">Masukkan API key untuk melihat session.</p>
+    <section id="session-panel" class="panel" aria-labelledby="session-heading">
+      <div class="panel-heading"><div><h2 id="session-heading">Daftar session <span id="session-count" class="count">0</span></h2><p class="muted">Status diperbarui otomatis setiap 5 detik.</p></div><button id="refresh" class="secondary" type="button">Perbarui</button></div>
+      <div class="table-scroll"><table><thead><tr><th>Session</th><th>Nomor WhatsApp</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="sessions"></tbody></table></div>
+      <div id="empty" class="empty"><div class="empty-symbol">↔</div><h3>Belum ada session yang ditampilkan</h3><p class="muted">Buka dashboard dengan API key untuk memulai.</p></div>
+    </section>
+    <footer>NC-WA <span>REST API + webhook · Auth state tersimpan per session</span></footer>
   </main>
 </body>
 </html>

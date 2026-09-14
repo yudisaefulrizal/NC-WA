@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NC-WA — Pasangkan WhatsApp</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/qr.js" defer></script>
+</head>
+<body class="qr-page">
+  <main>
+    <a class="brand" href="/">← NC-WA / Session</a>
+    <h1>Pasangkan WhatsApp</h1>
+    <p>Buka WhatsApp di HP → Perangkat tertaut → Tautkan perangkat, lalu pindai QR di bawah.</p>
+    <form id="pair-form">
+      <label for="api-key">API key</label>
+      <input id="api-key" type="password" autocomplete="off" required>
+      <label for="session-id">ID session</label>
+      <input id="session-id" value="toko-a" pattern="[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}" maxlength="64" required>
+      <button type="submit">Buat / buka session</button>
+    </form>
+    <p id="status" role="status" aria-live="polite">Masukkan API key untuk memulai.</p>
+    <img id="qr" alt="QR untuk menautkan WhatsApp" width="280" height="280" hidden>
+    <p class="hint">QR diperbarui otomatis setiap 2 detik. Setelah terhubung, halaman ini bisa ditutup.</p>
+  </main>
+</body>
+</html>
