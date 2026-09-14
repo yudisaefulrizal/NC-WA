@@ -1,9 +1,11 @@
 import express from 'express';
+import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
 
 export function createApp(manager: SessionManager) {
   const app = express();
   app.disable('x-powered-by');
+  app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(express.json({ limit: '64kb' }));
   app.get('/sessions/:id/qr', (req, res) => res.json(manager.qr(req.params.id)));
   app.use((_req, _res, next) => next(new ApiError(404, 'not_found', 'Endpoint tidak ada')));

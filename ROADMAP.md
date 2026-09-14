@@ -7,7 +7,7 @@ Acuan: [SPEC.md](SPEC.md) — aturan kerja: [AGENT.md](AGENT.md)
 - [x] Session manager — satu proses, banyak session
 - [x] Auth state per session (`useMultiFileAuthState`)
 - [x] Login QR + endpoint `GET /sessions/:id/qr`
-- [ ] Halaman QR (polling 2 detik)
+- [x] Halaman QR (polling 2 detik)
 - [ ] `POST /sessions`, `GET /sessions`, `GET /sessions/:id`
 - [ ] Logout + hapus session
 - [ ] Reconnect otomatis, bedakan `loggedOut` dari putus biasa
