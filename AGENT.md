@@ -57,11 +57,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 **Sudah selesai:**
 - Seluruh implementasi tahap 1–6; 28 tes, build, dan uji browser lolos
-- Server terbaru aktif; toko-a tetap connected setelah restart
-- Pesan masuk dan pengiriman teks sampai di HP tujuan dikonfirmasi pemilik
+- Tahap 1 tuntas terbukti: restart, reconnect setelah wifi mati,
+  dan hapus device dari HP semuanya benar
+- Pesan masuk dan pengiriman teks sampai di HP tujuan
 
-**Menunggu pemilik:**
-- Uji jaringan/device, media/grup, webhook dan presence
-- Uji dashboard dengan HP serta instalasi bersih di server lain
+**Menunggu pemilik** (panduan: [UJI-MANUAL.md](UJI-MANUAL.md)):
+- Media, grup, webhook, presence
+- Dashboard dengan HP, instalasi bersih di server lain
 
-**Berikutnya:** uji media/grup, webhook, presence, dan instalasi
+**Berikutnya:** uji media, grup, webhook, presence — lalu deploy

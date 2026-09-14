@@ -103,9 +103,9 @@ curl -s -X POST $WA/sessions/toko-a/typing \
 
 ## 5. Jaringan & device (tahap 1, sisa)
 
-- [ ] Matikan wifi/data server → nyalakan lagi → reconnect sendiri,
+- [x] Matikan wifi/data server → nyalakan lagi → reconnect sendiri,
       status kembali `connected` tanpa scan ulang
-- [ ] Hapus device dari HP (WhatsApp → Perangkat tertaut) →
+- [x] Hapus device dari HP (WhatsApp → Perangkat tertaut) →
       status jadi `logged_out`, log tidak loop reconnect
 
 ## 6. Dashboard (tahap 5)

@@ -19,8 +19,8 @@ Acuan: [SPEC.md](SPEC.md) — aturan kerja: [AGENT.md](AGENT.md)
 - [x] [agent] `GET /sessions/:id` untuk id tidak ada → 404
 - [x] [manual] Scan QR dari HP → status jadi `connected`
 - [x] [manual] Restart engine → masih connected, tidak minta scan ulang
-- [manual] Matikan wifi lalu nyalakan → reconnect sendiri
-- [manual] Hapus device dari HP → status `logged_out`, tidak loop reconnect
+- [x] [manual] Matikan wifi lalu nyalakan → reconnect sendiri
+- [x] [manual] Hapus device dari HP → status `logged_out`, tidak loop reconnect
 
 Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
