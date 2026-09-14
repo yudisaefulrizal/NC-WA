@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** endpoint buat, list, dan detail session
+**Sedang dikerjakan:** logout dan hapus session
 
 **Sudah selesai:**
-- Setup, session persisten, endpoint dan halaman QR
+- Setup, session persisten, QR, endpoint buat/list/detail
 
 **Menunggu pemilik:**
 - (belum ada)
 
-**Berikutnya:** endpoint buat, list, dan detail session
+**Berikutnya:** logout dan hapus session

@@ -7,6 +7,12 @@ export function createApp(manager: SessionManager) {
   app.disable('x-powered-by');
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(express.json({ limit: '64kb' }));
+  app.post('/sessions', async (req, res) => {
+    const { id, status } = await manager.create(req.body?.id);
+    res.json({ id, status });
+  });
+  app.get('/sessions', (_req, res) => res.json(manager.list().map(({ id, status, phone }) => ({ id, status, phone }))));
+  app.get('/sessions/:id', (req, res) => res.json(manager.detail(req.params.id)));
   app.get('/sessions/:id/qr', (req, res) => res.json(manager.qr(req.params.id)));
   app.use((_req, _res, next) => next(new ApiError(404, 'not_found', 'Endpoint tidak ada')));
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
