@@ -35,8 +35,8 @@ curl -s -X POST $WA/sessions/toko-a/messages/media \
   -d "{\"to\":\"$TUJUAN\",\"type\":\"document\",\"url\":\"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf\",\"filename\":\"uji.pdf\"}"
 ```
 
-- [ ] Gambar sampai, caption terbaca
-- [ ] Dokumen sampai, bisa dibuka, namanya `uji.pdf`
+- [x] Gambar sampai, caption terbaca
+- [x] Dokumen sampai, bisa dibuka, namanya `uji.pdf`
 
 ## 2. Grup (tahap 2)
 
@@ -66,8 +66,8 @@ BASE_URL=http://127.0.0.1:8066
 
 Kirim dari HP ke nomor engine:
 
-- [ ] Kirim teks → payload muncul di listener
-- [ ] Kirim gambar → `media.url` ada; unduh dengan:
+- [x] Kirim teks → payload muncul di listener
+- [x] Kirim gambar → `media.url` ada; unduh dengan:
       `curl -sI -H "X-API-Key: $KEY" "<media.url>"` → 200
 - [ ] Kirim dari grup → `isGroup: true`, `groupId` terisi,
       `sender` = nomor pengirim (bukan id grup)
@@ -98,8 +98,8 @@ curl -s -X POST $WA/sessions/toko-a/typing \
   -d "{\"to\":\"$TUJUAN\",\"state\":\"composing\"}"
 ```
 
-- [ ] Centang biru muncul di HP pengirim
-- [ ] Indikator "sedang mengetik" terlihat di HP (beberapa detik)
+- [x] Centang biru muncul di HP pengirim
+- [x] Indikator "sedang mengetik" terlihat di HP (beberapa detik)
 
 ## 5. Jaringan & device (tahap 1, sisa)
 

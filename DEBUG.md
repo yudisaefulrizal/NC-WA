@@ -47,3 +47,16 @@ yang sama muncul lagi, catatannya sudah ada.
   sumbernya console langsung di libsignal/src/session_record.js.
 - Status: diperbaiki dengan menonaktifkan info/warn library dan mengganti
   error library dengan ringkasan tanpa objek; log aplikasi memakai console.log.
+
+## Pesan masuk diterima engine tapi tidak sampai ke webhook
+- Gejala: `stats.received` bertambah, filter `all`, tapi listener webhook
+  tidak menerima event `message` sama sekali.
+- Terbukti bukan penyebabnya: filter session (`all`), listener (uji POST
+  langsung dibalas 200), dan isi `.env` (WEBHOOK_URL sudah terisi).
+- Sebab: dua engine jalan bersamaan. Proses `npm start` lama memegang
+  port 8066 dan session, dijalankan sebelum WEBHOOK_URL ditambahkan;
+  `npm run dev` yang baru gagal mengikat port tapi tidak memberi pesan
+  apa pun sehingga terlihat seperti jalan normal.
+- Status: selesai — proses lama dimatikan.
+- Menyusul: engine sebaiknya berhenti dengan pesan jelas kalau port
+  sudah dipakai, bukan diam. Lihat catatan di ROADMAP tahap 6.

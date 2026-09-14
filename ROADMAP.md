@@ -35,7 +35,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] Body tanpa `to` → 400
 - [x] [agent] Queue benar-benar memberi jeda antar pesan
 - [x] [manual] Teks sampai di HP tujuan
-- [manual] Gambar + caption sampai, dokumen bisa dibuka
+- [x] [manual] Gambar + caption sampai, dokumen bisa dibuka
 - [manual] Kirim ke grup sampai
 
 ## 3. Terima
@@ -49,8 +49,8 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] Webhook gagal → retry 3x lalu berhenti
 - [x] [agent] Filter `private` → pesan grup tidak diteruskan
 - [x] [agent] `/media/:id` tanpa API key → 401
-- [manual] Kirim dari HP → webhook menerima payload
-- [manual] Kirim gambar dari HP → URL media bisa diunduh
+- [x] [manual] Kirim dari HP → webhook menerima payload
+- [x] [manual] Kirim gambar dari HP → URL media bisa diunduh
 - [manual] Pesan grup terbaca `isGroup: true` dan `sender` benar
 
 ## 4. Presence
@@ -58,8 +58,8 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Sedang mengetik (kirim `available` dulu)
 
 **Uji**
-- [manual] Tandai dibaca → centang biru muncul di HP pengirim
-- [manual] Typing → indikator "sedang mengetik" terlihat di HP tujuan
+- [x] [manual] Tandai dibaca → centang biru muncul di HP pengirim
+- [x] [manual] Typing → indikator "sedang mengetik" terlihat di HP tujuan
 
 ## 5. UI
 - [x] List session + status

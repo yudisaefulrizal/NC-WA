@@ -53,16 +53,19 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** implementasi selesai; menunggu tes manual
+**Sedang dikerjakan:** uji manual bersama pemilik
 
 **Sudah selesai:**
-- Seluruh implementasi tahap 1–6; 28 tes, build, dan uji browser lolos
-- Tahap 1 tuntas terbukti: restart, reconnect setelah wifi mati,
-  dan hapus device dari HP semuanya benar
-- Pesan masuk dan pengiriman teks sampai di HP tujuan
+- Implementasi tahap 1–6; 28 tes, build, dan tipe lolos
+- Tahap 1 tuntas: restart, reconnect, logout setelah device dihapus
+- Tahap 2: teks, gambar + caption, dokumen sampai di HP
+- Tahap 3: webhook pesan masuk & status, media masuk tersimpan dan
+  hanya bisa diunduh dengan API key
+- Tahap 4: centang biru dan indikator mengetik terlihat di HP
 
 **Menunggu pemilik** (panduan: [UJI-MANUAL.md](UJI-MANUAL.md)):
-- Media, grup, webhook, presence
-- Dashboard dengan HP, instalasi bersih di server lain
+- Grup: kirim ke grup, dan pesan masuk dari grup
+- Dashboard di browser
+- Instalasi bersih di server lain
 
-**Berikutnya:** uji media, grup, webhook, presence — lalu deploy
+**Berikutnya:** uji grup, lalu dashboard, lalu deploy
