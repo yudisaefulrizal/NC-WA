@@ -75,7 +75,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [manual] Ubah filter lewat UI, cek berubah di `GET /sessions/:id`
 
 ## 6. Rapikan
-- [ ] Batasi ukuran request body
+- [x] Batasi ukuran request body
 - [ ] Validasi URL media keluar
 - [ ] Hapus media otomatis (`MEDIA_RETENTION_DAYS`)
 - [ ] Log per session

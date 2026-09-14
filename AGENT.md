@@ -52,13 +52,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 5 — UI
-**Sedang dikerjakan:** pemeriksaan batas body dan URL media
+**Tahap:** 6 — Rapikan
+**Sedang dikerjakan:** validasi URL media keluar
 
 **Sudah selesai:**
-- Tahap 1–5 diimplementasikan
+- Tahap 1–5; batas body 64 KiB dilindungi tes
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** pemeriksaan batas body dan URL media
+**Berikutnya:** validasi URL media keluar
