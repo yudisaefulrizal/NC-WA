@@ -33,6 +33,23 @@ Harus tetap pendek — rencana ada di roadmap, ini cuma posisi.
 
 ---
 
+## Git
+
+Satu item roadmap = satu commit. Riwayat git jadi sejajar dengan
+checklist, gampang ditelusuri kalau ada yang rusak.
+
+Pesan commit: judul kalimat perintah bahasa Indonesia ("Tambah...",
+"Perbaiki..."), badan menjelaskan **kenapa** — bukan mengulang apa
+yang berubah, itu sudah terlihat di diff.
+
+**Push hanya kalau pemilik menyuruh.** Sekali terkirim sulit ditarik.
+
+**Jangan pernah commit** `.env` dan folder auth state — isinya API key
+dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
+`git add` pertama di tahap 1.
+
+---
+
 ## Status
 
 **Tahap:** 1 — Fondasi
