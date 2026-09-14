@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 3 — Terima
-**Sedang dikerjakan:** retry webhook
+**Sedang dikerjakan:** simpan media masuk
 
 **Sudah selesai:**
-- Tahap 1–2, penerimaan pesan dan webhook pesan/status/QR
+- Tahap 1–2, pesan masuk dan webhook dengan retry terbatas
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** retry webhook
+**Berikutnya:** simpan media masuk

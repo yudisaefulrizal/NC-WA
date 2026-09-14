@@ -24,6 +24,7 @@ const server = createApp(manager, apiKey).listen(port, process.env.HOST ?? '127.
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {
     server.close();
+    webhook.stop();
     void manager.stop().then(() => process.exit(0));
   });
 }
