@@ -91,7 +91,7 @@ yang tertimpa waktu update.
 ```
 API_KEY=
 WEBHOOK_URL=
-PORT=3000
+PORT=8066
 MEDIA_RETENTION_DAYS=7
 ```
 
