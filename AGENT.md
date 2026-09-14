@@ -53,12 +53,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** belum mulai
+**Sedang dikerjakan:** session manager
 
 **Sudah selesai:**
 - Spesifikasi, roadmap, logo
+- Setup TypeScript, Express, `.gitignore`
 
 **Menunggu pemilik:**
 - (belum ada)
 
-**Berikutnya:** setup proyek — TypeScript, Express, `.gitignore`
+**Berikutnya:** session manager multi-session

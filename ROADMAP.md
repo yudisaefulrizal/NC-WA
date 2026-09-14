@@ -3,7 +3,7 @@
 Acuan: [SPEC.md](SPEC.md) — aturan kerja: [AGENT.md](AGENT.md)
 
 ## 1. Fondasi
-- [ ] Setup proyek (TypeScript, Express, `.gitignore`)
+- [x] Setup proyek (TypeScript, Express, `.gitignore`)
 - [ ] Session manager — satu proses, banyak session
 - [ ] Auth state per session (`useMultiFileAuthState`)
 - [ ] Login QR + endpoint `GET /sessions/:id/qr`
