@@ -40,7 +40,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
 ## 3. Terima
 - [x] Tangkap pesan masuk
-- [ ] Webhook pesan masuk + status session
+- [x] Webhook pesan masuk + status session
 - [ ] Retry webhook 3x
 - [ ] Simpan media masuk ke disk + `GET /media/:id`
 - [ ] Filter private / group per session

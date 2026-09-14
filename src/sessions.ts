@@ -34,6 +34,7 @@ interface Session extends SessionInfo {
 export class SessionManager {
   protected sessions = new Map<string, Session>();
   private stopped = false;
+  onEvent?: (event: { event: string; sessionId: string; [key: string]: unknown }) => Promise<void>;
   onIncoming?: (session: SessionInfo, message: IncomingMessage) => Promise<void>;
   private queues = new WeakMap<Session, SendQueue>();
   constructor(protected connect: Connector, protected store?: SessionStore, private retryBaseMs = 1000, private sendIntervalMs = 1000) {}
@@ -188,7 +189,7 @@ export class SessionManager {
       if (update.status) this.status(session, update.status, 'update koneksi');
       if (update.status === 'connected') session.attempts = 0;
       if (update.phone) session.phone = update.phone;
-      if (update.qr) session.qr = update.qr;
+      if (update.qr) { session.qr = update.qr; this.emit({ event: 'session.qr', sessionId: session.id, qr: update.qr }); }
       if (update.status === 'connected' || update.status === 'logged_out') session.qr = null;
       void this.persist(session).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal menyimpan metadata`));
     });
@@ -197,7 +198,12 @@ export class SessionManager {
   }
   private status(session: Session, status: Status, reason: string) {
     if (session.status !== status) console.log(`${new Date().toISOString()} [${session.id}] ${session.status} → ${status}: ${reason}`);
+    const changed = session.status !== status;
     session.status = status;
+    if (changed) queueMicrotask(() => this.emit({ event: 'session.status', sessionId: session.id, status, phone: session.phone }));
+  }
+  private emit(event: { event: string; sessionId: string; [key: string]: unknown }) {
+    void this.onEvent?.(event).catch(() => console.log(`${new Date().toISOString()} [${event.sessionId}] Webhook gagal`));
   }
   private schedule(session: Session, immediate = false) {
     if (this.stopped || session.suspended || session.status === 'logged_out' || this.sessions.get(session.id) !== session) return;
