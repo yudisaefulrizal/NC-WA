@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** perapian log per session
+**Sedang dikerjakan:** konfigurasi dan instalasi
 
 **Sudah selesai:**
-- Tahap 1–5 dan keamanan/retensi media
+- Tahap 1–5, keamanan, retensi dan log sistem per session
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** perapian log per session
+**Berikutnya:** konfigurasi dan instalasi

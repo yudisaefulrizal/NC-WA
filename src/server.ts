@@ -1,3 +1,4 @@
+import { log } from './log.js';
 import { MediaStore } from './media.js';
 import { Webhook } from './webhook.js';
 import { resolve } from 'node:path';
@@ -17,7 +18,7 @@ const retentionDays = Number(process.env.MEDIA_RETENTION_DAYS ?? 7);
 if (!Number.isFinite(retentionDays) || retentionDays <= 0) throw new Error('MEDIA_RETENTION_DAYS harus angka positif');
 const media = new MediaStore(resolve(process.env.MEDIA_DIR ?? 'data/media'), process.env.BASE_URL ?? `http://127.0.0.1:${port}`, 32 * 1024 * 1024, retentionDays);
 await media.prune();
-const cleanupTimer = setInterval(() => { void media.prune().catch(() => console.log(`${new Date().toISOString()} Gagal membersihkan media`)); }, 3600_000);
+const cleanupTimer = setInterval(() => { void media.prune().catch(() => log(undefined, `Gagal membersihkan media`)); }, 3600_000);
 cleanupTimer.unref();
 manager.onEvent = event => webhook.post(event);
 manager.onIncoming = async (session, incoming) => {
@@ -26,7 +27,7 @@ manager.onIncoming = async (session, incoming) => {
 };
 await manager.restore();
 const server = createApp(manager, apiKey, media).listen(port, process.env.HOST ?? '127.0.0.1', () => {
-  console.log(`${new Date().toISOString()} Engine mendengarkan port ${port}`);
+  log(undefined, `Engine mendengarkan port ${port}`);
 });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {

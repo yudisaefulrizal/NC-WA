@@ -1,3 +1,4 @@
+import { log } from './log.js';
 import { parseIncoming } from './incoming.js';
 import makeWASocket, { useMultiFileAuthState, downloadMediaMessage, type AnyMessageContent, type WAMessageKey } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
@@ -17,7 +18,7 @@ export function baileysConnector(store: SessionStore): Connector {
     let saves = Promise.resolve();
     socket.ev.on('creds.update', () => {
       saves = saves.then(saveCreds).catch(() => {
-        console.log(`${new Date().toISOString()} [${id}] Gagal menyimpan kredensial`);
+        log(id, `Gagal menyimpan kredensial`);
       });
     });
     const messageKeys = new Map<string, WAMessageKey>();
@@ -45,7 +46,7 @@ export function baileysConnector(store: SessionStore): Connector {
         const generation = ++qrGeneration;
         void QRCode.toDataURL(event.qr).then(qr => {
           if (generation === qrGeneration) update({ status: 'qr_required', qr });
-        }).catch(() => console.log(`${new Date().toISOString()} [${id}] Gagal membuat QR`));
+        }).catch(() => log(id, `Gagal membuat QR`));
       }
       if (event.connection === 'open') update({ status: 'connected', phone: socket.user?.id.split(':')[0].split('@')[0] });
       if (event.connection === 'close') {

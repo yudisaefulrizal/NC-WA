@@ -1,3 +1,4 @@
+import { log } from './log.js';
 import { setTimeout } from 'node:timers/promises';
 export class Webhook {
   private abort = new AbortController();
@@ -19,7 +20,7 @@ export class Webhook {
         return;
       } catch {
         if (this.abort.signal.aborted) return;
-        console.log(`${new Date().toISOString()} [${payload.sessionId}] Webhook gagal, percobaan ${attempt + 1}/4`);
+        log(payload.sessionId, `Webhook gagal, percobaan ${attempt + 1}/4`);
         if (attempt === 3) return;
         await setTimeout(this.retryMs * 2 ** attempt, undefined, { signal: this.abort.signal }).catch(() => {});
       }

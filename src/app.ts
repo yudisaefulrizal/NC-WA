@@ -1,3 +1,4 @@
+import { log } from './log.js';
 import type { MediaStore } from './media.js';
 import express from 'express';
 import { sendText, sendMedia, object, recipient, requiredString } from './messages.js';
@@ -47,7 +48,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
     if (status === 400 || status === 413) {
       res.status(status).json({ error: 'invalid_request', message: status === 413 ? 'Body terlalu besar' : 'JSON tidak valid' }); return;
     }
-    console.log(`${new Date().toISOString()} Error saat menangani request`);
+    log(_req.path.match(/^\/sessions\/([A-Za-z0-9_-]{1,64})(?:\/|$)/)?.[1], 'Error saat menangani request');
     res.status(500).json({ error: 'internal_error', message: 'Terjadi kesalahan internal' });
   });
   return app;

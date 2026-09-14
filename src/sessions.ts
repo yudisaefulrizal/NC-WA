@@ -1,3 +1,4 @@
+import { log } from './log.js';
 import type { IncomingMessage } from './incoming.js';
 import { SendQueue } from './queue.js';
 import type { Outbound } from './messages.js';
@@ -214,7 +215,7 @@ export class SessionManager {
       if (update.incoming) {
         this.received++;
         if ((session.filter === 'private' && update.incoming.isGroup) || (session.filter === 'group' && !update.incoming.isGroup)) return;
-        void this.onIncoming?.(this.detail(session.id), update.incoming).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal memproses pesan masuk`));
+        void this.onIncoming?.(this.detail(session.id), update.incoming).catch(() => log(session.id, `Gagal memproses pesan masuk`));
         return;
       }
       if (update.disconnected !== undefined) {
@@ -233,26 +234,26 @@ export class SessionManager {
       if (update.phone) session.phone = update.phone;
       if (update.qr) { session.qr = update.qr; this.emit({ event: 'session.qr', sessionId: session.id, qr: update.qr }); }
       if (update.status === 'connected' || update.status === 'logged_out') session.qr = null;
-      void this.persist(session).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal menyimpan metadata`));
+      void this.persist(session).catch(() => log(session.id, `Gagal menyimpan metadata`));
     });
     if (generation !== session.generation) await connection.close();
     else session.connection = connection;
   }
   private status(session: Session, status: Status, reason: string) {
-    if (session.status !== status) console.log(`${new Date().toISOString()} [${session.id}] ${session.status} → ${status}: ${reason}`);
+    if (session.status !== status) log(session.id, `${session.status} → ${status}: ${reason}`);
     const changed = session.status !== status;
     session.status = status;
     if (changed) queueMicrotask(() => this.emit({ event: 'session.status', sessionId: session.id, status, phone: session.phone }));
   }
   private emit(event: { event: string; sessionId: string; [key: string]: unknown }) {
-    void this.onEvent?.(event).catch(() => console.log(`${new Date().toISOString()} [${event.sessionId}] Webhook gagal`));
+    void this.onEvent?.(event).catch(() => log(event.sessionId, `Webhook gagal`));
   }
   private schedule(session: Session, immediate = false) {
     if (this.stopped || session.suspended || session.status === 'logged_out' || this.sessions.get(session.id) !== session) return;
     clearTimeout(session.retry);
     const attempt = session.attempts = (session.attempts ?? 0) + 1;
     const delay = immediate ? 0 : Math.min(this.retryBaseMs * 2 ** Math.min(attempt - 1, 6), 30_000);
-    console.log(`${new Date().toISOString()} [${session.id}] Reconnect percobaan ${attempt}, jeda ${delay}ms`);
+    log(session.id, `Reconnect percobaan ${attempt}, jeda ${delay}ms`);
     session.retry = setTimeout(() => {
       void (async () => {
         await session.opening?.catch(() => {});
@@ -262,7 +263,7 @@ export class SessionManager {
         if (this.stopped || session.suspended) return;
         await this.open(session);
       })().catch(() => {
-        console.log(`${new Date().toISOString()} [${session.id}] Reconnect gagal`);
+        log(session.id, `Reconnect gagal`);
         this.schedule(session);
       });
     }, delay);
