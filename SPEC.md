@@ -137,7 +137,19 @@ PORT=8066
 MEDIA_RETENTION_DAYS=7
 ```
 
-Langkah instal ditulis setelah kodenya jadi.
+**Kebutuhan server.** Node 22+, 1 core, disk lokal. RAM yang menentukan:
+~150 MB per session, bertambah mengikuti jumlah kontak dan anggota grup
+yang pernah berinteraksi (kunci enkripsi per lawan bicara dipegang di
+memori, tidak dilepas). 1 GB untuk 3–5 session. Batasi heap Node dengan
+`NODE_OPTIONS=--max-old-space-size=` sekitar 75% RAM server.
+
+Tetap `useMultiFileAuthState`, bukan SQLite: yang diperbaiki database
+hanya pemborosan blok disk, sedangkan salinan kerja tetap di memori.
+Pola tulis Baileys yang sangat sering juga lebih aman di file terpisah —
+satu file rusak hanya menghilangkan satu kunci, database rusak
+menghilangkan seluruh session.
+
+Langkah instal: lihat README.
 
 ## Teknologi
 - TypeScript

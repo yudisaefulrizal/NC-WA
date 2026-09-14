@@ -35,6 +35,35 @@ Untuk pengembangan: `npm run dev`. Setelah perubahan kode produksi, jalankan
 `npm run build` dan restart `npm start`. Ctrl+C menghentikan socket dan menyimpan
 kredensial; restart memakai auth sebelumnya tanpa scan ulang.
 
+## Kebutuhan server
+
+Node.js 22+, 1 CPU core, disk lokal (bukan NFS — auth state berupa ribuan
+file kecil). Koneksi stabil lebih penting daripada cepat: engine memegang
+WebSocket terus-menerus.
+
+RAM adalah batas yang menentukan. Satu session terukur ~150 MB, dan
+bertambah seiring banyaknya kontak dan anggota grup yang pernah
+berinteraksi — kunci enkripsi per lawan bicara disimpan di memori dan
+tidak dilepas. Pemakaian naik lalu mendatar, bukan naik-turun.
+
+| Session | RAM disarankan |
+|---|---|
+| 1–2 | 512 MB (tanpa margin) |
+| 3–5 | 1 GB |
+| lebih | 2 GB |
+
+Batasi heap Node agar proses membersihkan memori sebelum dibunuh OOM
+killer — kira-kira 75% RAM server:
+
+```sh
+NODE_OPTIONS=--max-old-space-size=768 npm start
+```
+
+Disk: `node_modules` ~130 MB. Auth state ~50 MB per session di disk
+(isinya hanya ~1 MB; sisanya blok terbuang karena ribuan file mungil).
+Media masuk mengikuti lalu lintas dan `MEDIA_RETENTION_DAYS`. 10–20 GB
+lapang untuk pemakaian normal.
+
 ## Konfigurasi
 
 | Env | Default | Kegunaan |
