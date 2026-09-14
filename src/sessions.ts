@@ -36,6 +36,9 @@ interface Session extends SessionInfo {
 export class SessionManager {
   protected sessions = new Map<string, Session>();
   private stopped = false;
+  private started = Date.now();
+  private sent = 0;
+  private received = 0;
   onEvent?: (event: { event: string; sessionId: string; [key: string]: unknown }) => Promise<void>;
   onIncoming?: (session: SessionInfo, message: IncomingMessage) => Promise<void>;
   private queues = new WeakMap<Session, SendQueue>();
@@ -84,6 +87,11 @@ export class SessionManager {
     try { await session.opening; }
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
+  }
+  stats() {
+    const sessions: Record<string, number> = { total: this.sessions.size, connected: 0, logged_out: 0, connecting: 0, qr_required: 0 };
+    for (const session of this.sessions.values()) sessions[session.status]++;
+    return { uptime: Math.floor((Date.now() - this.started) / 1000), sessions, messages: { sent: this.sent, received: this.received } };
   }
   async typing(id: string, jid: string, state: unknown) {
     if (state !== 'composing' && state !== 'paused') throw new ApiError(400, 'invalid_request', 'state harus composing atau paused');
@@ -137,6 +145,7 @@ export class SessionManager {
       if (!jid.endsWith('@g.us') && connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
       if (!connection.send) throw new Error('Transport tidak mendukung pengiriman');
       const messageId = await connection.send(jid, content);
+      this.sent++;
       return { messageId, to: jid };
     } catch (error) {
       if (error instanceof ApiError) throw error;
@@ -203,6 +212,7 @@ export class SessionManager {
     const connection = await this.connect(session.id, update => {
       if (this.sessions.get(session.id) !== session || generation !== session.generation) return;
       if (update.incoming) {
+        this.received++;
         if ((session.filter === 'private' && update.incoming.isGroup) || (session.filter === 'group' && !update.incoming.isGroup)) return;
         void this.onIncoming?.(this.detail(session.id), update.incoming).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal memproses pesan masuk`));
         return;

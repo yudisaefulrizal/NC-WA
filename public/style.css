@@ -57,3 +57,10 @@ footer { display: flex; justify-content: space-between; color: #8b9a93; font-siz
 #qr { max-width: 100%; height: auto; margin: 16px auto; }
 #qr:not([hidden]) { display: block; }
 @media (max-width: 780px) { .topbar { padding: 14px 20px; flex-wrap: wrap; gap: 20px; } .engine-label { display: none; } nav { margin-left: auto; gap: 15px; } .dashboard { padding: 28px 18px; } .heading { align-items: flex-start; flex-direction: column; } .access { flex-wrap: wrap; padding: 18px; gap: 14px; } .access div { width: 100%; } .access input { margin: 0; flex: 1 1 180px; } td, th { padding: 14px 18px; } footer span { max-width: 65%; text-align: right; } }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 24px; }
+.stats article { padding: 22px; }
+.stats span, .stats small { display: block; font-size: 12px; color: var(--muted); }
+.stats strong { display: block; font-size: 30px; font-weight: 650; letter-spacing: -.04em; margin: 12px 0 6px; }
+td select { font-size: 12px; }
+@media (max-width: 780px) { .stats { grid-template-columns: repeat(2, 1fr); gap: 12px; } .stats article { padding: 18px; } }

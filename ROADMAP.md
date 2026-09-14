@@ -65,7 +65,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] List session + status
 - [x] Buat session, logout, hapus
 - [x] Atur filter
-- [ ] Statistik + `GET /stats`
+- [x] Statistik + `GET /stats`
 - [ ] Halaman dokumentasi API
 
 **Uji**

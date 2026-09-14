@@ -73,10 +73,15 @@ async function refresh() {
   clearTimeout(timer);
   const current = ++generation;
   try {
-    const list = await api('/sessions');
+    const [list, stats] = await Promise.all([api('/sessions'), api('/stats')]);
     const sessions = await Promise.all(list.map(session => api(`/sessions/${encodeURIComponent(session.id)}`)));
     if (current !== generation) return;
     render(sessions);
+    document.querySelector('#stats').hidden = false;
+    document.querySelector('#stat-connected').textContent = stats.sessions.connected;
+    document.querySelector('#stat-sent').textContent = stats.messages.sent.toLocaleString('id-ID');
+    document.querySelector('#stat-received').textContent = stats.messages.received.toLocaleString('id-ID');
+    document.querySelector('#stat-uptime').textContent = stats.uptime < 3600 ? `${Math.floor(stats.uptime / 60)}m` : `${Math.floor(stats.uptime / 3600)}j ${Math.floor(stats.uptime % 3600 / 60)}m`;
     notice.textContent = `Terakhir diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
   } catch (error) { if (current === generation) notice.textContent = error.message; }
   if (current === generation) timer = setTimeout(refresh, 5000);

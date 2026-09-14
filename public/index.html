@@ -16,6 +16,12 @@
     <section class="heading"><div><p class="eyebrow">RUANG KERJA</p><h1>Session WhatsApp</h1><p class="muted">Kelola nomor dan koneksi WhatsApp Anda dari satu tempat.</p></div><a class="button" href="/qr.html">+ Pasangkan nomor</a></section>
     <form id="access-form" class="access panel"><div><label for="api-key">API key</label><p class="muted">Gunakan key dari konfigurasi engine Anda.</p></div><input id="api-key" type="password" autocomplete="off" placeholder="Masukkan API key" required><button type="submit">Buka dashboard</button></form>
     <p id="notice" role="status" aria-live="polite">Masukkan API key untuk melihat session.</p>
+    <section id="stats" class="stats" aria-label="Statistik engine" hidden>
+      <article class="panel"><span>Session aktif</span><strong id="stat-connected">0</strong><small>Nomor tersambung</small></article>
+      <article class="panel"><span>Pesan terkirim</span><strong id="stat-sent">0</strong><small>Sejak engine dimulai</small></article>
+      <article class="panel"><span>Pesan diterima</span><strong id="stat-received">0</strong><small>Sejak engine dimulai</small></article>
+      <article class="panel"><span>Waktu aktif</span><strong id="stat-uptime">0m</strong><small>Reset saat restart</small></article>
+    </section>
     <section id="session-panel" class="panel" aria-labelledby="session-heading">
       <div class="panel-heading"><div><h2 id="session-heading">Daftar session <span id="session-count" class="count">0</span></h2><p class="muted">Status diperbarui otomatis setiap 5 detik.</p></div><button id="refresh" class="secondary" type="button">Perbarui</button></div>
       <div class="table-scroll"><table><thead><tr><th>Session</th><th>Nomor WhatsApp</th><th>Status</th><th>Pesan ke webhook</th><th>Aksi</th></tr></thead><tbody id="sessions"></tbody></table></div>

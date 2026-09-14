@@ -11,6 +11,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.get('/stats', (_req, res) => res.json(manager.stats()));
   app.post('/sessions/:id/typing', async (req, res) => {
     const input = object(req.body);
     res.json(await manager.typing(req.params.id, recipient(input.to), input.state));
