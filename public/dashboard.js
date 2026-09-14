@@ -17,7 +17,7 @@ async function api(path, options = {}) {
 function cell(row, text) { const td = row.insertCell(); td.textContent = text; return td; }
 function render(sessions) {
   const next = JSON.stringify(sessions);
-  if (signature === next) return;
+  if (signature === next || tbody.contains(document.activeElement)) return;
   signature = next;
   tbody.replaceChildren();
   document.querySelector('#session-count').textContent = sessions.length;
@@ -31,6 +31,21 @@ function render(sessions) {
     status.className = `badge ${session.status}`;
     status.textContent = labels[session.status] || session.status;
     cell(row, '').append(status);
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', `Filter pesan session ${session.id}`);
+    for (const [value, text] of [['all', 'Semua pesan'], ['private', 'Pribadi saja'], ['group', 'Grup saja']]) {
+      const option = new Option(text, value); select.add(option);
+    }
+    select.value = session.filter;
+    select.addEventListener('change', async () => {
+      select.disabled = true;
+      try {
+        await api(`/sessions/${encodeURIComponent(session.id)}/filter`, { method: 'PUT', body: JSON.stringify({ filter: select.value }) });
+        signature = ''; await refresh();
+      } catch (error) { notice.textContent = error.message; select.value = session.filter; }
+      finally { select.disabled = false; }
+    });
+    cell(row, '').append(select);
     const actions = document.createElement('div'); actions.className = 'actions';
     const link = document.createElement('a'); link.href = `/qr.html?session=${encodeURIComponent(session.id)}`; link.textContent = 'Buka QR';
     if (session.status !== 'connected' && session.status !== 'logged_out') actions.append(link);
@@ -58,7 +73,8 @@ async function refresh() {
   clearTimeout(timer);
   const current = ++generation;
   try {
-    const sessions = await api('/sessions');
+    const list = await api('/sessions');
+    const sessions = await Promise.all(list.map(session => api(`/sessions/${encodeURIComponent(session.id)}`)));
     if (current !== generation) return;
     render(sessions);
     notice.textContent = `Terakhir diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
