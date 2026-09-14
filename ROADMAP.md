@@ -54,7 +54,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [manual] Pesan grup terbaca `isGroup: true` dan `sender` benar
 
 ## 4. Presence
-- [ ] Tandai dibaca
+- [x] Tandai dibaca
 - [ ] Sedang mengetik (kirim `available` dulu)
 
 **Uji**

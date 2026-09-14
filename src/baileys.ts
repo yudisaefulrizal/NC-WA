@@ -1,8 +1,8 @@
 import { parseIncoming } from './incoming.js';
-import makeWASocket, { useMultiFileAuthState, downloadMediaMessage, type AnyMessageContent } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, downloadMediaMessage, type AnyMessageContent, type WAMessageKey } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
 import { join } from 'node:path';
-import type { Connector } from './sessions.js';
+import { ApiError, type Connector } from './sessions.js';
 import type { SessionStore } from './store.js';
 
 // Baileys requires this interface. Suppress library traffic and credential logs.
@@ -20,12 +20,16 @@ export function baileysConnector(store: SessionStore): Connector {
         console.log(`${new Date().toISOString()} [${id}] Gagal menyimpan kredensial`);
       });
     });
+    const messageKeys = new Map<string, WAMessageKey>();
     const seen = new Set<string>();
     socket.ev.on('messages.upsert', event => {
       if (event.type !== 'notify') return;
       for (const message of event.messages) {
         const incoming = parseIncoming(message);
         if (!incoming) continue;
+        const address = incoming.from.includes('@') ? incoming.from : `${incoming.from}@s.whatsapp.net`;
+        messageKeys.set(`${address}:${incoming.messageId}`, message.key);
+        if (messageKeys.size > 5000) messageKeys.delete(messageKeys.keys().next().value!);
         const key = `${message.key.remoteJid}:${incoming.messageId}`;
         if (seen.has(key)) continue;
         seen.add(key);
@@ -50,6 +54,11 @@ export function baileysConnector(store: SessionStore): Connector {
       }
     });
     return {
+      async read(jid, messageId, sender) {
+        const cached = messageKeys.get(`${jid}:${messageId}`);
+        if (jid.endsWith('@g.us') && !cached && !sender) throw new ApiError(400, 'invalid_request', 'sender wajib untuk pesan grup yang belum dikenal setelah restart');
+        await socket.readMessages([cached ?? { remoteJid: jid, id: messageId, fromMe: false, participant: sender }]);
+      },
       async exists(jid) { return Boolean((await socket.onWhatsApp(jid))?.some(result => result.exists)); },
       async send(jid, content) {
         let outgoing: AnyMessageContent;

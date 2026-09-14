@@ -52,13 +52,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 3 — Terima
-**Sedang dikerjakan:** tandai pesan dibaca
+**Tahap:** 4 — Presence
+**Sedang dikerjakan:** presence sedang mengetik
 
 **Sudah selesai:**
-- Tahap 1–3 diimplementasikan, termasuk filter persisten
+- Tahap 1–3 dan endpoint tandai dibaca
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** tandai pesan dibaca
+**Berikutnya:** presence sedang mengetik

@@ -1,6 +1,6 @@
 import type { MediaStore } from './media.js';
 import express from 'express';
-import { sendText, sendMedia } from './messages.js';
+import { sendText, sendMedia, object, recipient, requiredString } from './messages.js';
 import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
@@ -11,6 +11,10 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.post('/sessions/:id/read', async (req, res) => {
+    const input = object(req.body);
+    res.json(await manager.read(req.params.id, recipient(input.from), requiredString(input.messageId, 'messageId', 200), input.sender === undefined ? undefined : recipient(input.sender)));
+  });
   app.put('/sessions/:id/filter', async (req, res) => res.json(await manager.setFilter(req.params.id, req.body?.filter)));
   app.get('/media/:id', async (req, res) => {
     if (!media) throw new ApiError(404, 'media_not_found', 'Media tidak ada');

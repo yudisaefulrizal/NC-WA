@@ -15,6 +15,7 @@ export class ApiError extends Error {
 export interface Connection {
   close(): void | Promise<void>;
   logout(): Promise<void>;
+  read?(jid: string, messageId: string, sender?: string): Promise<void>;
   send?(jid: string, content: Outbound): Promise<string>;
   exists?(jid: string): Promise<boolean>;
 }
@@ -82,6 +83,17 @@ export class SessionManager {
     try { await session.opening; }
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
+  }
+  async read(id: string, jid: string, messageId: string, sender?: string) {
+    const connection = this.connected(id);
+    try {
+      if (!connection.read) throw new Error('Transport tidak mendukung read');
+      await connection.read(jid, messageId, sender);
+      return { ok: true };
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      throw new ApiError(502, 'send_failed', 'Gagal menandai pesan dibaca');
+    }
   }
   async setFilter(id: string, filter: unknown) {
     if (filter !== 'all' && filter !== 'private' && filter !== 'group') throw new ApiError(400, 'invalid_request', 'filter harus all, private, atau group');
