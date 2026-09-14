@@ -22,3 +22,20 @@ yang sama muncul lagi, catatannya sudah ada.
 ---
 
 <!-- belum ada. isi waktu ada percobaan perbaikan yang gagal. -->
+
+## Reconnect terus dijadwalkan tetapi tidak membuka socket baru
+- Coba 1: menunggu `session.opening` sebelum setiap retry → setelah satu
+  pembukaan socket ditolak, retry berikutnya kembali menerima rejection
+  yang sama; tes regresi hanya mencatat 2 pembukaan, seharusnya 3.
+- Terbukti bukan penyebabnya: timer/backoff berjalan dan callback putus
+  terpanggil; kegagalan direproduksi dengan socket tiruan tanpa jaringan.
+- Coba 2: tangani rejection lama sebelum retry/cleanup → tes regresi
+  berhasil membuka socket ketiga dan kembali connected.
+- Status: selesai — promise pembukaan gagal tidak lagi menghalangi retry.
+
+## Perintah lokal tertolak oleh sandbox
+- Instal npm gagal `EAI_AGAIN`; tsx gagal membuat socket IPC (`EPERM`);
+  Git gagal menulis `.git/index.lock` karena read-only.
+- Terbukti bukan penyebabnya: dependensi terpasang, tes lolos, dan commit
+  berhasil setelah perintah dijalankan dengan izin yang sesuai.
+- Status: selesai — pembatasan lingkungan, bukan kesalahan aplikasi.

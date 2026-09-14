@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** reconnect otomatis
+**Sedang dikerjakan:** middleware API key dan verifikasi tahap 1
 
 **Sudah selesai:**
-- Setup, session persisten, QR, CRUD dan logout session
+- Fondasi session lengkap termasuk reconnect dan logout
 
 **Menunggu pemilik:**
 - (belum ada)
 
-**Berikutnya:** reconnect otomatis
+**Berikutnya:** middleware API key dan verifikasi tahap 1

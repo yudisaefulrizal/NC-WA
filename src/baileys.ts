@@ -21,8 +21,9 @@ export function baileysConnector(store: SessionStore): Connector {
     });
     let qrGeneration = 0;
     socket.ev.on('connection.update', event => {
-      const generation = ++qrGeneration;
+      if (event.connection === 'open' || event.connection === 'close') qrGeneration++;
       if (event.qr) {
+        const generation = ++qrGeneration;
         void QRCode.toDataURL(event.qr).then(qr => {
           if (generation === qrGeneration) update({ status: 'qr_required', qr });
         }).catch(() => console.log(`${new Date().toISOString()} [${id}] Gagal membuat QR`));
@@ -34,7 +35,7 @@ export function baileysConnector(store: SessionStore): Connector {
       }
     });
     return {
-      async close() { socket.ev.removeAllListeners('connection.update'); socket.end(undefined); await saves; },
+      async close() { qrGeneration++; socket.ev.removeAllListeners('connection.update'); socket.end(undefined); await saves; },
       async logout() { await socket.logout(); await saves; },
     };
   };

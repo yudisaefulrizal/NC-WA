@@ -10,7 +10,7 @@ Acuan: [SPEC.md](SPEC.md) — aturan kerja: [AGENT.md](AGENT.md)
 - [x] Halaman QR (polling 2 detik)
 - [x] `POST /sessions`, `GET /sessions`, `GET /sessions/:id`
 - [x] Logout + hapus session
-- [ ] Reconnect otomatis, bedakan `loggedOut` dari putus biasa
+- [x] Reconnect otomatis, bedakan `loggedOut` dari putus biasa
 - [ ] API key middleware
 
 **Uji**

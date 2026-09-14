@@ -47,3 +47,39 @@ test('logout menutup koneksi dan hapus membebaskan ID', async () => {
   assert.equal((await request(app).get('/sessions/a')).status, 404);
   assert.equal((await request(app).post('/sessions').send({ id: 'a' })).status, 200);
 });
+
+test('putus biasa reconnect; event socket lama dan loggedOut tidak reconnect', async () => {
+  const updates: Array<(event: import('../src/sessions.js').Update) => void> = [];
+  const manager = new SessionManager(async (_id, update) => {
+    updates.push(update);
+    return { close() {}, async logout() {} };
+  }, undefined, 5);
+  await manager.create('a');
+  updates[0]({ status: 'qr_required', qr: 'qr-lama' });
+  updates[0]({ disconnected: 408 });
+  await new Promise(resolve => setTimeout(resolve, 30));
+  assert.equal(updates.length, 2);
+  updates[1]({ status: 'connected', phone: '628123' });
+  updates[0]({ status: 'qr_required', qr: 'stale' });
+  assert.deepEqual(manager.qr('a'), { status: 'connected', qr: null });
+  updates[1]({ disconnected: 401 });
+  await new Promise(resolve => setTimeout(resolve, 30));
+  assert.equal(updates.length, 2);
+  assert.equal(manager.detail('a').status, 'logged_out');
+  await manager.stop();
+});
+test('hapus dan shutdown membatalkan reconnect tertunda', async () => {
+  for (const action of ['remove', 'stop']) {
+    let count = 0;
+    let update!: (event: import('../src/sessions.js').Update) => void;
+    const manager = new SessionManager(async (_id, callback) => {
+      count++; update = callback;
+      return { close() {}, async logout() {} };
+    }, undefined, 10);
+    await manager.create('a');
+    update({ disconnected: 408 });
+    if (action === 'remove') await manager.remove('a'); else await manager.stop();
+    await new Promise(resolve => setTimeout(resolve, 30));
+    assert.equal(count, 1);
+  }
+});
