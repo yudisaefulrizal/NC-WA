@@ -1,3 +1,4 @@
+import type { IncomingMessage } from './incoming.js';
 import { SendQueue } from './queue.js';
 import type { Outbound } from './messages.js';
 import type { SessionStore } from './store.js';
@@ -17,7 +18,7 @@ export interface Connection {
   send?(jid: string, content: Outbound): Promise<string>;
   exists?(jid: string): Promise<boolean>;
 }
-export interface Update { status?: Status; phone?: string; qr?: string; disconnected?: number }
+export interface Update { incoming?: IncomingMessage; status?: Status; phone?: string; qr?: string; disconnected?: number }
 export type Connector = (id: string, update: (event: Update) => void) => Promise<Connection>;
 interface Session extends SessionInfo {
   qr: string | null;
@@ -33,6 +34,7 @@ interface Session extends SessionInfo {
 export class SessionManager {
   protected sessions = new Map<string, Session>();
   private stopped = false;
+  onIncoming?: (session: SessionInfo, message: IncomingMessage) => Promise<void>;
   private queues = new WeakMap<Session, SendQueue>();
   constructor(protected connect: Connector, protected store?: SessionStore, private retryBaseMs = 1000, private sendIntervalMs = 1000) {}
   async restore() {
@@ -168,6 +170,10 @@ export class SessionManager {
     const generation = ++session.generation;
     const connection = await this.connect(session.id, update => {
       if (this.sessions.get(session.id) !== session || generation !== session.generation) return;
+      if (update.incoming) {
+        void this.onIncoming?.(this.detail(session.id), update.incoming).catch(() => console.log(`${new Date().toISOString()} [${session.id}] Gagal memproses pesan masuk`));
+        return;
+      }
       if (update.disconnected !== undefined) {
         session.generation++;
         session.qr = null;

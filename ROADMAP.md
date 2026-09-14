@@ -39,7 +39,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [manual] Kirim ke grup sampai
 
 ## 3. Terima
-- [ ] Tangkap pesan masuk
+- [x] Tangkap pesan masuk
 - [ ] Webhook pesan masuk + status session
 - [ ] Retry webhook 3x
 - [ ] Simpan media masuk ke disk + `GET /media/:id`

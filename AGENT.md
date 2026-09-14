@@ -52,13 +52,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 2 — Kirim
-**Sedang dikerjakan:** tangkap pesan masuk
+**Tahap:** 3 — Terima
+**Sedang dikerjakan:** webhook pesan dan status
 
 **Sudah selesai:**
-- Tahap 1–2 diimplementasikan; kirim teks/media, grup/pribadi, queue
+- Tahap 1–2; parser pesan masuk dengan dukungan grup dan LID
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** tangkap pesan masuk
+**Berikutnya:** webhook pesan dan status

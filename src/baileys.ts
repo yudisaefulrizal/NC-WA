@@ -1,4 +1,5 @@
-import makeWASocket, { useMultiFileAuthState, type AnyMessageContent } from '@whiskeysockets/baileys';
+import { parseIncoming } from './incoming.js';
+import makeWASocket, { useMultiFileAuthState, downloadMediaMessage, type AnyMessageContent } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
 import { join } from 'node:path';
 import type { Connector } from './sessions.js';
@@ -18,6 +19,20 @@ export function baileysConnector(store: SessionStore): Connector {
       saves = saves.then(saveCreds).catch(() => {
         console.log(`${new Date().toISOString()} [${id}] Gagal menyimpan kredensial`);
       });
+    });
+    const seen = new Set<string>();
+    socket.ev.on('messages.upsert', event => {
+      if (event.type !== 'notify') return;
+      for (const message of event.messages) {
+        const incoming = parseIncoming(message);
+        if (!incoming) continue;
+        const key = `${message.key.remoteJid}:${incoming.messageId}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        if (seen.size > 5000) seen.delete(seen.values().next().value!);
+        if (incoming.type !== 'text') incoming.download = () => downloadMediaMessage(message, 'stream', {}, { logger: silentLogger, reuploadRequest: socket.updateMediaMessage });
+        update({ incoming });
+      }
     });
     let qrGeneration = 0;
     socket.ev.on('connection.update', event => {
@@ -52,7 +67,7 @@ export function baileysConnector(store: SessionStore): Connector {
         if (!message?.key.id) throw new Error('WhatsApp tidak memberikan ID pesan');
         return message.key.id;
       },
-      async close() { qrGeneration++; socket.ev.removeAllListeners('connection.update'); socket.end(undefined); await saves; },
+      async close() { qrGeneration++; socket.ev.removeAllListeners('connection.update'); socket.ev.removeAllListeners('messages.upsert'); socket.end(undefined); await saves; },
       async logout() { await socket.logout(); await saves; },
     };
   };
