@@ -19,6 +19,8 @@ interface Session extends SessionInfo {
   qr: string | null;
   connection?: Connection;
   generation: number;
+  opening?: Promise<void>;
+  mutation?: Promise<unknown>;
 }
 
 export class SessionManager {
@@ -63,7 +65,49 @@ export class SessionManager {
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
   }
-  protected async open(session: Session) {
+  private async mutate<T>(id: string, action: (session: Session) => Promise<T>): Promise<T> {
+    const session = this.get(id);
+    const task = (session.mutation ?? Promise.resolve()).catch(() => {}).then(() => {
+      if (this.sessions.get(id) !== session) throw new ApiError(404, 'session_not_found', `Session ${id} tidak ada`);
+      return action(session);
+    });
+    session.mutation = task;
+    return task;
+  }
+  async logout(id: string) {
+    return this.mutate(id, async session => {
+      await session.opening;
+      if (session.status !== 'logged_out') {
+        // Let WhatsApp confirm the unlink before discarding the working connection.
+        try { await session.connection?.logout(); }
+        catch { throw new ApiError(502, 'logout_failed', 'Logout gagal; coba lagi setelah koneksi pulih'); }
+        session.generation++;
+        await session.connection?.close();
+        session.connection = undefined;
+        session.status = 'logged_out';
+        session.phone = null;
+        session.qr = null;
+        await this.persist(session);
+      }
+      return { id, status: session.status };
+    });
+  }
+  async remove(id: string) {
+    return this.mutate(id, async session => {
+      session.generation++;
+      await session.opening;
+      await session.connection?.close();
+      await this.store?.remove(id);
+      this.sessions.delete(id);
+      return { deleted: true };
+    });
+  }
+  protected open(session: Session) {
+    const opening = this.openConnection(session);
+    session.opening = opening;
+    return opening;
+  }
+  private async openConnection(session: Session) {
     const generation = ++session.generation;
     const connection = await this.connect(session.id, update => {
       if (this.sessions.get(session.id) !== session || generation !== session.generation) return;
@@ -79,6 +123,8 @@ export class SessionManager {
   async stop() {
     for (const session of this.sessions.values()) {
       session.generation++;
+      await session.opening;
+      await session.mutation?.catch(() => {});
       await session.connection?.close();
     }
     await this.store?.flush();

@@ -32,3 +32,18 @@ test('list dan detail tidak membocorkan QR atau koneksi', async () => {
   assert.deepEqual((await request(app).get('/sessions')).body, [{ id: 'a', status: 'connecting', phone: null }]);
   assert.deepEqual((await request(app).get('/sessions/a')).body, { id: 'a', status: 'connecting', phone: null, filter: 'all' });
 });
+test('logout menutup koneksi dan hapus membebaskan ID', async () => {
+  const actions: string[] = [];
+  const manager = new SessionManager(async (_id, update) => {
+    update({ status: 'connected', phone: '628123' });
+    return { close() { actions.push('close'); }, async logout() { actions.push('logout'); } };
+  });
+  const app = createApp(manager);
+  await request(app).post('/sessions').send({ id: 'a' });
+  assert.deepEqual((await request(app).post('/sessions/a/logout')).body, { id: 'a', status: 'logged_out' });
+  assert.deepEqual(manager.qr('a'), { status: 'logged_out', qr: null });
+  assert.deepEqual(actions, ['logout', 'close']);
+  assert.deepEqual((await request(app).delete('/sessions/a')).body, { deleted: true });
+  assert.equal((await request(app).get('/sessions/a')).status, 404);
+  assert.equal((await request(app).post('/sessions').send({ id: 'a' })).status, 200);
+});
