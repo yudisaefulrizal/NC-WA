@@ -1,4 +1,5 @@
 import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
+import QRCode from 'qrcode';
 import { join } from 'node:path';
 import type { Connector } from './sessions.js';
 import type { SessionStore } from './store.js';
@@ -18,7 +19,14 @@ export function baileysConnector(store: SessionStore): Connector {
         console.log(`${new Date().toISOString()} [${id}] Gagal menyimpan kredensial`);
       });
     });
+    let qrGeneration = 0;
     socket.ev.on('connection.update', event => {
+      const generation = ++qrGeneration;
+      if (event.qr) {
+        void QRCode.toDataURL(event.qr).then(qr => {
+          if (generation === qrGeneration) update({ status: 'qr_required', qr });
+        }).catch(() => console.log(`${new Date().toISOString()} [${id}] Gagal membuat QR`));
+      }
       if (event.connection === 'open') update({ status: 'connected', phone: socket.user?.id.split(':')[0].split('@')[0] });
       if (event.connection === 'close') {
         const error = event.lastDisconnect?.error as { output?: { statusCode?: number } } | undefined;

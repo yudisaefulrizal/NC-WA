@@ -52,6 +52,7 @@ export class SessionManager {
     const { status, phone, filter } = this.get(id);
     return { id, status, phone, filter };
   }
+  qr(id: string) { const { status, qr } = this.get(id); return { status, qr }; }
   list() { return [...this.sessions.keys()].map(id => this.detail(id)); }
   async create(id: unknown) {
     SessionManager.validateId(id);
