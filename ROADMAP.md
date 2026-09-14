@@ -66,7 +66,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Buat session, logout, hapus
 - [x] Atur filter
 - [x] Statistik + `GET /stats`
-- [ ] Halaman dokumentasi API
+- [x] Halaman dokumentasi API
 
 **Uji**
 - [agent] `GET /stats` mengembalikan bentuk yang benar

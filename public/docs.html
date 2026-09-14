@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NC-WA — Dokumentasi API</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header class="topbar"><a class="identity" href="/"><img src="/logo.png" alt="" width="42" height="42"><span>NC-WA <small>WHATSAPP GATEWAY</small></span></a><nav aria-label="Navigasi utama"><a href="/">Session</a><a class="active" href="/docs.html">Dokumentasi API</a></nav></header>
+<main class="dashboard docs">
+<p class="eyebrow">REFERENSI INTEGRASI</p><h1>Dokumentasi API</h1><p class="muted">Satu endpoint untuk satu perintah. Semua API memakai header <code>X-API-Key</code>.</p>
+<section class="panel"><h2>Mulai dari sini</h2><p>Base URL lokal: <code>http://127.0.0.1:8066</code>. Semua respons sukses berstatus 200. Gunakan HTTPS jika engine diakses melalui internet.</p><pre><code>curl http://127.0.0.1:8066/sessions \
+  -H 'X-API-Key: KEY_ANDA'</code></pre><p>Nomor pribadi: <code>628123456789</code>. Grup: <code>1234567890-1234567@g.us</code> atau JID grup numerik tanpa tanda hubung.</p></section>
+<section class="panel"><h2>Session</h2><div class="table-scroll"><table><thead><tr><th>Metode dan endpoint</th><th>Body / hasil</th></tr></thead><tbody>
+<tr><td><code>POST /sessions</code></td><td><code>{"id":"toko-a"}</code> → id dan status (connecting saat QR belum siap)</td></tr>
+<tr><td><code>GET /sessions</code></td><td>Array id, status, phone</td></tr>
+<tr><td><code>GET /sessions/:id</code></td><td>id, status, phone, filter</td></tr>
+<tr><td><code>GET /sessions/:id/qr</code></td><td>status dan qr (data URL PNG atau null); polling setiap 2 detik hingga connected</td></tr>
+<tr><td><code>POST /sessions/:id/logout</code></td><td>id dan status logged_out</td></tr>
+<tr><td><code>DELETE /sessions/:id</code></td><td><code>{"deleted":true}</code>; hapus auth lokal. Logout dahulu untuk mencabut device dari HP.</td></tr>
+<tr><td><code>PUT /sessions/:id/filter</code></td><td><code>{"filter":"all"}</code>; pilihan all, private, group; tersimpan saat restart</td></tr>
+</tbody></table></div><p>Status: <code>connecting</code>, <code>qr_required</code>, <code>connected</code>, <code>logged_out</code>. Hapus lalu buat ulang session logged_out untuk memasangkan kembali.</p></section>
+<section class="panel"><h2>Kirim teks dan media</h2><p>Request menunggu antrean dan hasil pengiriman ke WhatsApp. Respons 200 bukan bukti pesan sudah dibaca atau diterima HP tujuan. Jeda default 1 detik setelah pengiriman sebelumnya selesai, per session.</p><pre><code>POST /sessions/toko-a/messages/text
+{"to":"628123456789","text":"Halo"}
+
+POST /sessions/toko-a/messages/media
+{"to":"628123456789","type":"image","url":"https://example.com/photo.jpg","caption":"Halo","filename":"photo.jpg"}
+
+Respons:
+{"messageId":"3EB0...","to":"628123456789@s.whatsapp.net"}</code></pre><p>Jenis media: image, document, audio, video. Caption opsional; nama file dipakai untuk dokumen. URL harus HTTP/HTTPS publik. Batas media 32 MiB secara default.</p></section>
+<section class="panel"><h2>Presence</h2><pre><code>POST /sessions/toko-a/read
+{"from":"628123456789","messageId":"3EB0..."}
+
+POST /sessions/toko-a/typing
+{"to":"628123456789","state":"composing"}
+
+Respons: {"ok":true}</code></pre><p>State mengetik: composing atau paused. Untuk receipt grup yang belum tersimpan di memori (misalnya sesudah restart), sertakan <code>sender</code> berupa nomor pengirim. Indikator dibaca mengikuti pengaturan privasi WhatsApp.</p></section>
+<section class="panel"><h2>Webhook dan media masuk</h2><p>Isi <code>WEBHOOK_URL</code> pada konfigurasi engine. Engine mengirim POST JSON untuk event message, session.status, dan session.qr. Jika gagal, coba ulang 3 kali dengan jeda 1, 2, dan 4 detik. Penerima sebaiknya memproses messageId + sessionId secara idempoten.</p><pre><code>{"event":"message","sessionId":"toko-a","messageId":"3EB0...",
+ "from":"628123456789","isGroup":false,"groupId":null,
+ "sender":"628123456789","type":"text","text":"Halo",
+ "media":null,"timestamp":1757808000}</code></pre><p>Untuk grup, from dan groupId berisi JID grup; sender adalah pengirim. Alamat LID dipertahankan dengan akhiran @lid bila nomor alternatif tidak tersedia. Jenis media membawa <code>media: {"url":".../media/ID","mimetype":"image/jpeg"}</code>. Unduh melalui <code>GET /media/:id</code> dengan API key; jangan taruh key di URL. File kedaluwarsa setelah 7 hari secara default.</p><pre><code>{"event":"session.status","sessionId":"toko-a","status":"connected","phone":"628123456789"}
+{"event":"session.qr","sessionId":"toko-a","qr":"data:image/png;base64,..."}</code></pre><p>Antrean webhook dan deduplikasi berada di memori, bukan penyimpanan durable. Restart dapat menghilangkan event yang belum selesai dikirim.</p></section>
+<section class="panel"><h2>Statistik dan error</h2><p><code>GET /stats</code> → uptime dalam detik, sessions berisi total dan jumlah tiap status, messages berisi sent dan received. Statistik reset saat engine restart.</p><pre><code>{"error":"session_not_connected","message":"Session toko-a belum tersambung"}</code></pre><div class="table-scroll"><table><thead><tr><th>HTTP</th><th>Kode error</th></tr></thead><tbody><tr><td>400</td><td>invalid_request, invalid_number</td></tr><tr><td>401</td><td>unauthorized</td></tr><tr><td>404</td><td>session_not_found, media_not_found, not_found</td></tr><tr><td>409</td><td>session_exists, session_not_connected</td></tr><tr><td>413</td><td>invalid_request (body terlalu besar)</td></tr><tr><td>500</td><td>internal_error</td></tr><tr><td>502</td><td>send_failed, logout_failed</td></tr><tr><td>503</td><td>queue_full, unavailable</td></tr></tbody></table></div><p>Cocokkan field error, bukan teks message. Batasi body JSON maksimal 64 KiB. Jangan otomatis mengulang request pengiriman yang timeout: pesan mungkin sudah terkirim.</p></section>
+<footer>NC-WA <a href="/">Kembali ke dashboard</a></footer>
+</main></body></html>
