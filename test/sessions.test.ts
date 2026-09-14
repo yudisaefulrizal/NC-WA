@@ -4,33 +4,41 @@ import request from 'supertest';
 import { createApp } from '../src/app.js';
 import { SessionManager } from '../src/sessions.js';
 
+function authorized(app: ReturnType<typeof createApp>) {
+  const client = request(app);
+  return {
+    get: (path: string) => client.get(path).set('X-API-Key', 'test-key'),
+    post: (path: string) => client.post(path).set('X-API-Key', 'test-key'),
+    delete: (path: string) => client.delete(path).set('X-API-Key', 'test-key'),
+  };
+}
 function fixture() {
   const manager = new SessionManager(async () => ({ close() {}, async logout() {} }));
-  return { manager, app: createApp(manager) };
+  return { manager, app: createApp(manager, 'test-key') };
 }
 test('ID ganda ditolak 409, termasuk request bersamaan', async () => {
   const { app } = fixture();
-  const results = await Promise.all([request(app).post('/sessions').send({ id: 'toko-a' }), request(app).post('/sessions').send({ id: 'toko-a' })]);
+  const results = await Promise.all([authorized(app).post('/sessions').send({ id: 'toko-a' }), authorized(app).post('/sessions').send({ id: 'toko-a' })]);
   assert.deepEqual(results.map(r => r.status).sort(), [200, 409]);
   assert.equal(results.find(r => r.status === 409)?.body.error, 'session_exists');
 });
 test('detail session tidak ada menghasilkan 404', async () => {
   const { app } = fixture();
-  const result = await request(app).get('/sessions/tidak-ada');
+  const result = await authorized(app).get('/sessions/tidak-ada');
   assert.equal(result.status, 404);
   assert.equal(result.body.error, 'session_not_found');
 });
 test('ID yang dapat keluar dari folder auth ditolak', async () => {
   const { app } = fixture();
   for (const id of ['../secret', '', '.', 'a/b', null, 123]) {
-    assert.equal((await request(app).post('/sessions').send({ id })).status, 400);
+    assert.equal((await authorized(app).post('/sessions').send({ id })).status, 400);
   }
 });
 test('list dan detail tidak membocorkan QR atau koneksi', async () => {
   const { app } = fixture();
-  await request(app).post('/sessions').send({ id: 'a' });
-  assert.deepEqual((await request(app).get('/sessions')).body, [{ id: 'a', status: 'connecting', phone: null }]);
-  assert.deepEqual((await request(app).get('/sessions/a')).body, { id: 'a', status: 'connecting', phone: null, filter: 'all' });
+  await authorized(app).post('/sessions').send({ id: 'a' });
+  assert.deepEqual((await authorized(app).get('/sessions')).body, [{ id: 'a', status: 'connecting', phone: null }]);
+  assert.deepEqual((await authorized(app).get('/sessions/a')).body, { id: 'a', status: 'connecting', phone: null, filter: 'all' });
 });
 test('logout menutup koneksi dan hapus membebaskan ID', async () => {
   const actions: string[] = [];
@@ -38,14 +46,14 @@ test('logout menutup koneksi dan hapus membebaskan ID', async () => {
     update({ status: 'connected', phone: '628123' });
     return { close() { actions.push('close'); }, async logout() { actions.push('logout'); } };
   });
-  const app = createApp(manager);
-  await request(app).post('/sessions').send({ id: 'a' });
-  assert.deepEqual((await request(app).post('/sessions/a/logout')).body, { id: 'a', status: 'logged_out' });
+  const app = createApp(manager, 'test-key');
+  await authorized(app).post('/sessions').send({ id: 'a' });
+  assert.deepEqual((await authorized(app).post('/sessions/a/logout')).body, { id: 'a', status: 'logged_out' });
   assert.deepEqual(manager.qr('a'), { status: 'logged_out', qr: null });
   assert.deepEqual(actions, ['logout', 'close']);
-  assert.deepEqual((await request(app).delete('/sessions/a')).body, { deleted: true });
-  assert.equal((await request(app).get('/sessions/a')).status, 404);
-  assert.equal((await request(app).post('/sessions').send({ id: 'a' })).status, 200);
+  assert.deepEqual((await authorized(app).delete('/sessions/a')).body, { deleted: true });
+  assert.equal((await authorized(app).get('/sessions/a')).status, 404);
+  assert.equal((await authorized(app).post('/sessions').send({ id: 'a' })).status, 200);
 });
 
 test('putus biasa reconnect; event socket lama dan loggedOut tidak reconnect', async () => {
@@ -81,5 +89,26 @@ test('hapus dan shutdown membatalkan reconnect tertunda', async () => {
     if (action === 'remove') await manager.remove('a'); else await manager.stop();
     await new Promise(resolve => setTimeout(resolve, 30));
     assert.equal(count, 1);
+  }
+});
+
+test('seluruh API menolak key kosong/salah sebelum memproses body', async () => {
+  const { app } = fixture();
+  for (const key of ['', 'wrong-key', 'test-ke']) {
+    const result = await request(app).post('/sessions').set('X-API-Key', key).set('Content-Type', 'application/json').send('broken-json');
+    assert.equal(result.status, 401);
+    assert.equal(result.body.error, 'unauthorized');
+  }
+  assert.equal((await request(app).get('/sessions/a/qr')).status, 401);
+  assert.equal((await request(app).delete('/sessions/a')).status, 401);
+  assert.equal((await request(app).post('/sessions/a/logout')).status, 401);
+  assert.equal((await request(app).get('/media/secret')).status, 401);
+  assert.equal((await request(app).get('/')).status, 200);
+});
+test('key tidak boleh kosong dan file privat tidak disajikan', async () => {
+  const { manager, app } = fixture();
+  assert.throws(() => createApp(manager, ''), /API_KEY/);
+  for (const path of ['/.env', '/auth/a/auth/creds.json', '/SPEC.md']) {
+    assert.notEqual((await authorized(app).get(path)).status, 200);
   }
 });

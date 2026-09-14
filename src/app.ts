@@ -1,11 +1,13 @@
 import express from 'express';
+import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
 
-export function createApp(manager: SessionManager) {
+export function createApp(manager: SessionManager, apiKey: string) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
+  app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
   app.post('/sessions', async (req, res) => {
     const { id, status } = await manager.create(req.body?.id);

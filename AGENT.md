@@ -53,12 +53,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** middleware API key dan verifikasi tahap 1
+**Sedang dikerjakan:** menunggu gerbang uji manual tahap 1
 
 **Sudah selesai:**
-- Fondasi session lengkap termasuk reconnect dan logout
+- Seluruh implementasi tahap 1; 13 tes otomatis, build, dan QR WhatsApp nyata lolos
 
 **Menunggu pemilik:**
-- (belum ada)
+- Scan QR hingga connected; restart engine tetap connected tanpa scan ulang
+- Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** middleware API key dan verifikasi tahap 1
+**Berikutnya:** uji manual scan QR dan restart sebelum tahap 2
