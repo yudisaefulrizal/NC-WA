@@ -140,7 +140,10 @@ Jangan otomatis mengulang request timeout karena pesan mungkin sudah terkirim.
 
 Logout mencabut device di WhatsApp. DELETE menutup socket dan menghapus auth
 lokal; logout dahulu jika ingin sekaligus mencabut perangkat dari HP.
-Session logged_out harus dihapus lalu dibuat ulang untuk scan kembali.
+Session logged_out dipasang ulang lewat `POST /sessions/:id/reconnect`
+(tombol **Pasang ulang** di dashboard): auth lama dibuang, QR baru terbit,
+id dan filter tetap. Tombol Hapus dimatikan selama status connected agar
+perangkat tidak menggantung di HP.
 
 ## Webhook dan media masuk
 
