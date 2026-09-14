@@ -101,5 +101,7 @@ berikutnya. Sisa UI paling belakang.
   dokumentasi dan viewport mobile lulus tanpa error JavaScript.
 - Scan QR dikonfirmasi pemilik; restart engine terbaru terbukti kembali connected.
 - Smoke HTTP server terbaru: dashboard/QR/dokumentasi/statistik 200, API tanpa key 401.
-- Tes manual lain di atas tetap menunggu; belum ada pengiriman pesan nyata
-  atau webhook ke tujuan milik pemilik yang diuji.
+- Pemilik mengonfirmasi pesan masuk ke nomor yang login; webhook belum terkonfirmasi.
+- Satu uji kirim teks nyata melalui toko-a menghasilkan HTTP 200 dan messageId.
+  Konfirmasi pesan tampil di HP tujuan masih menunggu; checklist pengiriman
+  sampai di HP belum ditandai lulus. Tes manual lainnya tetap menunggu.
