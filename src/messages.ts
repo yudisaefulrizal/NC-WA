@@ -16,6 +16,10 @@ export function recipient(value: unknown): string {
   if (!/^[1-9][0-9]{5,14}$/.test(to)) throw new ApiError(400, 'invalid_request', 'to harus nomor internasional tanpa +');
   return `${to}@s.whatsapp.net`;
 }
+export function readRecipient(value: unknown): string {
+  if (typeof value === 'string' && /^[0-9]+@lid$/.test(value)) return value;
+  return recipient(value);
+}
 export async function sendText(manager: SessionManager, id: string, body: unknown) {
   const input = object(body);
   const jid = recipient(input.to);

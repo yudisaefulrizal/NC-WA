@@ -70,3 +70,6 @@ td select { font-size: 12px; }
 .docs code { font-family: ui-monospace, monospace; font-size: 12px; }
 .docs pre { background: #f5f8f6; border: 1px solid var(--line); border-radius: 7px; padding: 18px; overflow-x: auto; line-height: 1.7; }
 .docs td { font-weight: 400; line-height: 1.6; }
+
+#session-panel table { min-width: 740px; }
+#sessions td:first-child { white-space: nowrap; }

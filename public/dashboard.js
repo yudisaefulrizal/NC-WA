@@ -17,7 +17,7 @@ async function api(path, options = {}) {
 function cell(row, text) { const td = row.insertCell(); td.textContent = text; return td; }
 function render(sessions) {
   const next = JSON.stringify(sessions);
-  if (signature === next || tbody.contains(document.activeElement)) return;
+  if (signature === next || (tbody.contains(document.activeElement) && document.activeElement.tagName === 'SELECT' && !document.activeElement.disabled)) return;
   signature = next;
   tbody.replaceChildren();
   document.querySelector('#session-count').textContent = sessions.length;

@@ -1,4 +1,4 @@
-import { log } from './log.js';
+import { log, protectLibraryLogs } from './log.js';
 import { parseIncoming } from './incoming.js';
 import makeWASocket, { useMultiFileAuthState, downloadMediaMessage, type AnyMessageContent, type WAMessageKey } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
@@ -12,6 +12,7 @@ const silentLogger = {
   trace() {}, debug() {}, info() {}, warn() {}, error() {},
 };
 export function baileysConnector(store: SessionStore): Connector {
+  protectLibraryLogs();
   return async (id, update) => {
     const { state, saveCreds } = await useMultiFileAuthState(join(store.directory(id), 'auth'));
     const socket = makeWASocket({ auth: state, logger: silentLogger, markOnlineOnConnect: false, syncFullHistory: false });

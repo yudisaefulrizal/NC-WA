@@ -18,6 +18,7 @@ test('restore membuka session aktif dan mempertahankan logged_out tanpa koneksi'
   let manager = new SessionManager(connect, new SessionStore(root));
   try {
     await manager.create('active');
+    await manager.setFilter('active', 'private');
     callbacks.get('active')!({ status: 'connected', phone: '628123' });
     await manager.create('out');
     await manager.logout('out');
@@ -28,6 +29,7 @@ test('restore membuka session aktif dan mempertahankan logged_out tanpa koneksi'
     assert.deepEqual(connected, ['active']);
     assert.equal(manager.detail('out').status, 'logged_out');
     assert.equal(manager.detail('active').phone, '628123');
+    assert.equal(manager.detail('active').filter, 'private');
     assert.equal(JSON.parse(await readFile(join(root, 'active', 'session.json'), 'utf8')).status, 'connected');
     await manager.remove('active');
     await assert.rejects(stat(join(root, 'active')), { code: 'ENOENT' });

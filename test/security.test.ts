@@ -47,3 +47,12 @@ test('unduh media memakai alamat tervalidasi dan membatasi stream tanpa content-
   const file = await downloadPublicMedia('https://example.com/a', options);
   try { assert.equal(await readFile(file.path, 'utf8'), 'abcdef'); } finally { await file.cleanup(); }
 });
+
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+test('console langsung dari library tidak membocorkan objek auth', async () => {
+  const { stdout, stderr } = await promisify(execFile)(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', "import { protectLibraryLogs, log } from './src/log.ts'; protectLibraryLogs(); console.info('Closing session:', { secret: 'fixture-private-key' }); console.warn('Session already closed', { secret: 'fixture-private-key' }); console.error({ secret: 'fixture-private-key' }); log('a', 'Terhubung');"]);
+  assert.ok(!stdout.includes('fixture-private-key'));
+  assert.equal(stderr, '');
+  assert.ok(stdout.includes('[a] Terhubung'));
+});

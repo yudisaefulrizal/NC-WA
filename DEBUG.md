@@ -39,3 +39,11 @@ yang sama muncul lagi, catatannya sudah ada.
 - Terbukti bukan penyebabnya: dependensi terpasang, tes lolos, dan commit
   berhasil setelah perintah dijalankan dengan izin yang sesuai.
 - Status: selesai — pembatasan lingkungan, bukan kesalahan aplikasi.
+
+## Logger Baileys tidak menutup log kredensial dari libsignal
+- Coba 1: logger silent pada socket Baileys → audit dependensi menunjukkan
+  libsignal masih memanggil console.info/warn dengan objek session lengkap.
+- Terbukti bukan penyebabnya: log aplikasi tidak menerima body pesan;
+  sumbernya console langsung di libsignal/src/session_record.js.
+- Status: diperbaiki dengan menonaktifkan info/warn library dan mengganti
+  error library dengan ringkasan tanpa objek; log aplikasi memakai console.log.

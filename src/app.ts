@@ -1,7 +1,7 @@
 import { log } from './log.js';
 import type { MediaStore } from './media.js';
 import express from 'express';
-import { sendText, sendMedia, object, recipient, requiredString } from './messages.js';
+import { sendText, sendMedia, object, recipient, readRecipient, requiredString } from './messages.js';
 import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
@@ -19,7 +19,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   });
   app.post('/sessions/:id/read', async (req, res) => {
     const input = object(req.body);
-    res.json(await manager.read(req.params.id, recipient(input.from), requiredString(input.messageId, 'messageId', 200), input.sender === undefined ? undefined : recipient(input.sender)));
+    res.json(await manager.read(req.params.id, readRecipient(input.from), requiredString(input.messageId, 'messageId', 200), input.sender === undefined ? undefined : readRecipient(input.sender)));
   });
   app.put('/sessions/:id/filter', async (req, res) => res.json(await manager.setFilter(req.params.id, req.body?.filter)));
   app.get('/media/:id', async (req, res) => {
@@ -28,7 +28,9 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
     res.setHeader('Content-Type', file.mimetype);
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Content-Disposition', 'attachment');
-    res.sendFile(file.path);
+    res.sendFile(file.path, error => {
+      if (error && !res.headersSent) res.status(404).json({ error: 'media_not_found', message: 'Media tidak ada atau sudah kedaluwarsa' });
+    });
   });
   app.post('/sessions/:id/messages/media', async (req, res) => res.json(await sendMedia(manager, req.params.id, req.body)));
   app.post('/sessions/:id/messages/text', async (req, res) => res.json(await sendText(manager, req.params.id, req.body)));
@@ -43,6 +45,7 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.get('/sessions/:id/qr', (req, res) => res.json(manager.qr(req.params.id)));
   app.use((_req, _res, next) => next(new ApiError(404, 'not_found', 'Endpoint tidak ada')));
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    if (res.headersSent) { _next(error); return; }
     if (error instanceof ApiError) { res.status(error.status).json({ error: error.code, message: error.message }); return; }
     const status = (error as { status?: number })?.status;
     if (status === 400 || status === 413) {
