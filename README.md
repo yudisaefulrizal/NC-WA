@@ -64,6 +64,33 @@ Disk: `node_modules` ~130 MB. Auth state ~50 MB per session di disk
 Media masuk mengikuti lalu lintas dan `MEDIA_RETENTION_DAYS`. 10–20 GB
 lapang untuk pemakaian normal.
 
+## Deploy
+
+Terbukti jalan di aaPanel (Node.js Project, tab **Default Project** — bukan
+PM2 Project, karena cluster mode menjalankan lebih dari satu instance dan
+dua proses tidak boleh memegang session yang sama).
+
+Urutannya: clone, `npm ci`, isi `.env`, `npm run build` — semuanya sebelum
+mendaftarkan project di panel, karena `npm start` menjalankan `dist/` dan
+dropdown startup membaca `package.json` di Path yang diisi.
+
+Jalankan sebagai user `www` dan pastikan kepemilikan folder ikut:
+
+```sh
+mkdir -p auth data/media
+chown -R www:www /www/wwwroot/NC-WA
+chmod 600 .env
+```
+
+Biarkan `HOST=127.0.0.1`. Untuk membuka dashboard dari luar, pakai
+Cloudflare Tunnel yang mengarah ke `127.0.0.1:8066` — HTTPS otomatis dan
+tidak ada port yang perlu dibuka. Halaman HTML memang dapat diakses tanpa
+API key, tetapi seluruh endpoint data tetap menjawab 401; tambahkan
+Cloudflare Access bila ingin lapis kedua.
+
+Aliran SSE di halaman uji mengirim heartbeat tiap 25 detik dan menyetel
+`X-Accel-Buffering: no` agar tidak diputus proxy.
+
 ## Konfigurasi
 
 | Env | Default | Kegunaan |

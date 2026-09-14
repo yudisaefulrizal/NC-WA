@@ -121,4 +121,4 @@ Buka `http://127.0.0.1:8066` di browser.
 
 Di server lain atau folder baru, ikuti README apa adanya.
 
-- [ ] Jalan sampai bisa scan QR tanpa perlu menebak langkah
+- [x] Jalan sampai bisa scan QR tanpa perlu menebak langkah

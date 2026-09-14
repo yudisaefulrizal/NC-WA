@@ -88,7 +88,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] Body melebihi batas → ditolak
 - [x] [agent] URL media ke alamat lokal → ditolak
 - [x] [agent] File media lewat masa retensi → terhapus
-- [manual] Instal dari nol di server lain, ikuti README apa adanya
+- [x] [manual] Instal dari nol di server lain, ikuti README apa adanya
 
 ---
 

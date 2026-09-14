@@ -52,19 +52,17 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** tinggal uji instalasi di server
+**Tahap:** selesai — engine jalan di produksi
 
 **Sudah selesai:**
-- Implementasi tahap 1–6; 33 tes, build, dan tipe lolos
-- Tahap 1–5 tuntas diuji dengan WhatsApp nyata: reconnect, logout,
-  teks, media, grup, webhook, filter, read, typing
-- Dashboard tuntas: API key, pasang ulang sampai connected, ubah filter,
-  statistik
-- Halaman uji (`/test.html`): aliran SSE realtime dan kirim pesan
-  terkonfirmasi dua arah; riwayat hanya di browser
+- Seluruh tahap 1–6; 33 tes, build, dan tipe lolos
+- Semua uji manual lulus dengan WhatsApp nyata: reconnect, logout,
+  pasang ulang, teks, media, grup, webhook, filter, read, typing,
+  dashboard, dan halaman uji realtime
+- Terpasang di server lewat aaPanel Node project (mode default, bukan
+  PM2 cluster), Node v22.23.2, user www, port 8066 di localhost
+- Diakses lewat Cloudflare Tunnel dengan HTTPS; port tidak dibuka
+- Kirim dan terima pesan terkonfirmasi di server
 
-**Menunggu pemilik:**
-- Instalasi bersih di server lain mengikuti README (sekaligus uji deploy)
-
-**Berikutnya:** deploy ke server
+**Berikutnya:** tidak ada pekerjaan tertunda. Lanjutan bergantung
+kebutuhan aplikasi client.
