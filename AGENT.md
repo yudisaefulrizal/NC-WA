@@ -53,17 +53,16 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** uji manual bersama pemilik
+**Sedang dikerjakan:** tinggal uji instalasi di server
 
 **Sudah selesai:**
 - Implementasi tahap 1–6; 30 tes, build, dan tipe lolos
-- Tahap 1–4 tuntas diuji dengan WhatsApp nyata: reconnect, logout,
+- Tahap 1–5 tuntas diuji dengan WhatsApp nyata: reconnect, logout,
   teks, media, grup, webhook, filter, read, typing
-- Dashboard: logout, hapus, dan pasang ulang session terbukti jalan
+- Dashboard tuntas: API key, pasang ulang sampai connected, ubah filter,
+  statistik
 
-**Menunggu pemilik** (panduan: [UJI-MANUAL.md](UJI-MANUAL.md)):
-- Pasang nomor baru lewat UI sampai connected
-- Ubah filter lewat UI
-- Instalasi bersih di server lain
+**Menunggu pemilik:**
+- Instalasi bersih di server lain mengikuti README (sekaligus uji deploy)
 
-**Berikutnya:** sisa uji dashboard, lalu deploy
+**Berikutnya:** deploy ke server

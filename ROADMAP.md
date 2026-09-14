@@ -70,9 +70,9 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
 **Uji**
 - [x] [agent] `GET /stats` mengembalikan bentuk yang benar
-- [manual] Buka dashboard, masukkan API key, list session muncul
-- [manual] Pasang nomor baru lewat UI dari awal sampai connected
-- [manual] Ubah filter lewat UI, cek berubah di `GET /sessions/:id`
+- [x] [manual] Buka dashboard, masukkan API key, list session muncul
+- [x] [manual] Pasang ulang session lewat UI sampai connected
+- [x] [manual] Ubah filter lewat UI, cek berubah di `GET /sessions/:id`
 
 ## 6. Rapikan
 - [x] Batasi ukuran request body

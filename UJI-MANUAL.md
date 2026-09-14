@@ -112,10 +112,10 @@ curl -s -X POST $WA/sessions/toko-a/typing \
 
 Buka `http://127.0.0.1:8066` di browser.
 
-- [ ] Masukkan API key → daftar session muncul
-- [ ] Pasang nomor baru dari awal sampai `connected` lewat UI
-- [ ] Ubah filter lewat UI → berubah di `GET /sessions/toko-a`
-- [ ] Statistik tampil wajar
+- [x] Masukkan API key → daftar session muncul
+- [x] Pasang ulang session lewat UI sampai `connected`
+- [x] Ubah filter lewat UI → berubah di `GET /sessions/toko-a`
+- [x] Statistik tampil wajar
 
 ## 7. Instalasi bersih (tahap 6)
 
