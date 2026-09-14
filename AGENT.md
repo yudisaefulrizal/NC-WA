@@ -58,14 +58,14 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 **Sudah selesai:**
 - Implementasi tahap 1–6; 28 tes, build, dan tipe lolos
 - Tahap 1 tuntas: restart, reconnect, logout setelah device dihapus
-- Tahap 2: teks, gambar + caption, dokumen sampai di HP
-- Tahap 3: webhook pesan masuk & status, media masuk tersimpan dan
-  hanya bisa diunduh dengan API key
-- Tahap 4: centang biru dan indikator mengetik terlihat di HP
+- Tahap 2 tuntas: teks, gambar + caption, dokumen, kirim ke grup
+- Tahap 3 tuntas: webhook pesan masuk & status, pesan grup terbaca benar,
+  media masuk hanya bisa diunduh dengan API key, filter terbukti
+  menyaring grup saat `private` dan meneruskan lagi saat `all`
+- Tahap 4 tuntas: centang biru dan indikator mengetik terlihat di HP
 
 **Menunggu pemilik** (panduan: [UJI-MANUAL.md](UJI-MANUAL.md)):
-- Grup: kirim ke grup, dan pesan masuk dari grup
-- Dashboard di browser
+- Dashboard di browser (3 uji)
 - Instalasi bersih di server lain
 
-**Berikutnya:** uji grup, lalu dashboard, lalu deploy
+**Berikutnya:** uji dashboard, lalu deploy

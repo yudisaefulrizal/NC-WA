@@ -36,7 +36,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] Queue benar-benar memberi jeda antar pesan
 - [x] [manual] Teks sampai di HP tujuan
 - [x] [manual] Gambar + caption sampai, dokumen bisa dibuka
-- [manual] Kirim ke grup sampai
+- [x] [manual] Kirim ke grup sampai
 
 ## 3. Terima
 - [x] Tangkap pesan masuk
@@ -51,7 +51,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] `/media/:id` tanpa API key → 401
 - [x] [manual] Kirim dari HP → webhook menerima payload
 - [x] [manual] Kirim gambar dari HP → URL media bisa diunduh
-- [manual] Pesan grup terbaca `isGroup: true` dan `sender` benar
+- [x] [manual] Pesan grup terbaca `isGroup: true` dan `sender` benar
 
 ## 4. Presence
 - [x] Tandai dibaca

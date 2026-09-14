@@ -49,7 +49,7 @@ curl -s -X POST $WA/sessions/toko-a/messages/text \
   -d '{"to":"<GRUP>","text":"uji kirim grup"}'
 ```
 
-- [ ] Pesan muncul di grup
+- [x] Pesan muncul di grup
 
 ## 3. Webhook (tahap 3)
 
@@ -69,7 +69,7 @@ Kirim dari HP ke nomor engine:
 - [x] Kirim teks → payload muncul di listener
 - [x] Kirim gambar → `media.url` ada; unduh dengan:
       `curl -sI -H "X-API-Key: $KEY" "<media.url>"` → 200
-- [ ] Kirim dari grup → `isGroup: true`, `groupId` terisi,
+- [x] Kirim dari grup → `isGroup: true`, `groupId` terisi,
       `sender` = nomor pengirim (bukan id grup)
 - [ ] Isi pesan **tidak** muncul di log engine (terminal pertama)
 
@@ -79,8 +79,8 @@ curl -s -X PUT $WA/sessions/toko-a/filter \
   -H "X-API-Key: $KEY" -H 'content-type: application/json' \
   -d '{"filter":"private"}'
 ```
-- [ ] Pesan grup berhenti diteruskan, pesan pribadi tetap masuk
-- [ ] Kembalikan ke `all` setelah selesai
+- [x] Pesan grup berhenti diteruskan saat filter `private`
+- [x] Kembalikan ke `all` → pesan grup diteruskan lagi
 
 ## 4. Presence (tahap 4)
 
