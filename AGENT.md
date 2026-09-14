@@ -56,11 +56,13 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 **Sedang dikerjakan:** tinggal uji instalasi di server
 
 **Sudah selesai:**
-- Implementasi tahap 1–6; 30 tes, build, dan tipe lolos
+- Implementasi tahap 1–6; 33 tes, build, dan tipe lolos
 - Tahap 1–5 tuntas diuji dengan WhatsApp nyata: reconnect, logout,
   teks, media, grup, webhook, filter, read, typing
 - Dashboard tuntas: API key, pasang ulang sampai connected, ubah filter,
   statistik
+- Halaman uji (`/test.html`): aliran SSE realtime dan kirim pesan
+  terkonfirmasi dua arah; riwayat hanya di browser
 
 **Menunggu pemilik:**
 - Instalasi bersih di server lain mengikuti README (sekaligus uji deploy)

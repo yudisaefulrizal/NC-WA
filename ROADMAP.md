@@ -73,6 +73,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [manual] Buka dashboard, masukkan API key, list session muncul
 - [x] [manual] Pasang ulang session lewat UI sampai connected
 - [x] [manual] Ubah filter lewat UI, cek berubah di `GET /sessions/:id`
+- [x] [manual] Halaman uji: pesan masuk muncul realtime, kirim pesan sampai
 
 ## 6. Rapikan
 - [x] Batasi ukuran request body

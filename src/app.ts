@@ -5,13 +5,15 @@ import { sendText, sendMedia, object, recipient, readRecipient, requiredString }
 import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
+import type { EventStream } from './events.js';
 
-export function createApp(manager: SessionManager, apiKey: string, media?: MediaStore) {
+export function createApp(manager: SessionManager, apiKey: string, media?: MediaStore, events?: EventStream) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  if (events) app.get('/events', events.handler);
   app.get('/stats', (_req, res) => res.json(manager.stats()));
   app.post('/sessions/:id/typing', async (req, res) => {
     const input = object(req.body);

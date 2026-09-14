@@ -2,7 +2,7 @@
 <html lang="id">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NC-WA — Dokumentasi API</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header class="topbar"><a class="identity" href="/"><img src="/logo.png" alt="" width="42" height="42"><span>NC-WA <small>WHATSAPP GATEWAY</small></span></a><nav aria-label="Navigasi utama"><a href="/">Session</a><a class="active" href="/docs.html">Dokumentasi API</a></nav></header>
+<header class="topbar"><a class="identity" href="/"><img src="/logo.png" alt="" width="42" height="42"><span>NC-WA <small>WHATSAPP GATEWAY</small></span></a><nav aria-label="Navigasi utama"><a href="/">Session</a><a href="/test.html">Uji Pesan</a><a class="active" href="/docs.html">Dokumentasi API</a></nav></header>
 <main class="dashboard docs">
 <p class="eyebrow">REFERENSI INTEGRASI</p><h1>Dokumentasi API</h1><p class="muted">Satu endpoint untuk satu perintah. Semua API memakai header <code>X-API-Key</code>.</p>
 <section class="panel"><h2>Mulai dari sini</h2><p>Base URL lokal: <code>http://127.0.0.1:8066</code>. Semua respons sukses berstatus 200. Gunakan HTTPS jika engine diakses melalui internet.</p><pre><code>curl http://127.0.0.1:8066/sessions \
@@ -15,6 +15,7 @@
 <tr><td><code>POST /sessions/:id/logout</code></td><td>id dan status logged_out</td></tr>
 <tr><td><code>POST /sessions/:id/reconnect</code></td><td>id dan status connecting; hanya untuk session logged_out. Auth lama dibuang, QR baru terbit, id dan filter tetap.</td></tr>
 <tr><td><code>DELETE /sessions/:id</code></td><td><code>{"deleted":true}</code>; hapus auth lokal. Logout dahulu untuk mencabut device dari HP.</td></tr>
+<tr><td><code>GET /events</code></td><td>Server-Sent Events; mendorong event message, session.status, dan session.qr ke pemanggil yang terhubung. Tidak ada buffer: event tanpa pendengar hilang. Menerima API key lewat header atau <code>?key=</code> karena EventSource tidak bisa mengirim header.</td></tr>
 <tr><td><code>PUT /sessions/:id/filter</code></td><td><code>{"filter":"all"}</code>; pilihan all, private, group; tersimpan saat restart</td></tr>
 </tbody></table></div><p>Status: <code>connecting</code>, <code>qr_required</code>, <code>connected</code>, <code>logged_out</code>. Pasang ulang session logged_out lewat <code>POST /sessions/:id/reconnect</code>.</p></section>
 <section class="panel"><h2>Kirim teks dan media</h2><p>Request menunggu antrean dan hasil pengiriman ke WhatsApp. Respons 200 bukan bukti pesan sudah dibaca atau diterima HP tujuan. Jeda default 1 detik setelah pengiriman sebelumnya selesai, per session.</p><pre><code>POST /sessions/toko-a/messages/text

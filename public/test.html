@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NC-WA — Uji Pesan</title>
+  <link rel="icon" href="/logo.png"><link rel="stylesheet" href="/style.css">
+  <script src="/test.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="identity" href="/"><img src="/logo.png" alt="" width="42" height="42"><span>NC-WA <small>WHATSAPP GATEWAY</small></span></a>
+    <nav aria-label="Navigasi utama"><a href="/">Session</a><a class="active" href="/test.html">Uji Pesan</a><a href="/docs.html">Dokumentasi API</a></nav>
+    <span class="engine-label"><i></i> Riwayat tersimpan di browser</span>
+  </header>
+  <main class="dashboard">
+    <section class="heading"><div><p class="eyebrow">ALAT BANTU PENGEMBANGAN</p><h1>Uji Pesan</h1><p class="muted">Pesan masuk muncul seketika selama halaman terbuka. Riwayat disimpan di browser, tidak pernah dikirim atau disimpan engine.</p></div></section>
+
+    <form id="access-form" class="access panel"><div><label for="api-key">API key</label><p class="muted">Gunakan key dari konfigurasi engine Anda.</p></div><input id="api-key" type="password" autocomplete="off" placeholder="Masukkan API key" required><button type="submit">Sambungkan</button></form>
+    <p id="notice" role="status" aria-live="polite">Masukkan API key untuk mulai.</p>
+
+    <section id="composer" class="panel" aria-labelledby="composer-heading" hidden>
+      <div class="panel-heading"><div><h2 id="composer-heading">Kirim pesan</h2><p class="muted">Memakai endpoint kirim teks yang sama dengan aplikasi client.</p></div></div>
+      <div class="compose">
+        <div class="field"><label for="session">Session</label><select id="session"></select></div>
+        <div class="field"><label for="to">Tujuan</label><input id="to" type="text" placeholder="628123456789 atau 1234567890-123@g.us"></div>
+        <div class="field wide"><label for="text">Pesan</label><textarea id="text" rows="3" placeholder="Tulis pesan"></textarea></div>
+        <button id="send" type="button">Kirim pesan</button>
+      </div>
+    </section>
+
+    <section id="feed-panel" class="panel" aria-labelledby="feed-heading" hidden>
+      <div class="panel-heading">
+        <div><h2 id="feed-heading">Aliran pesan <span id="stream-state" class="badge">terputus</span></h2><p class="muted">Menampilkan <span id="feed-count">0</span> pesan terakhir dari browser ini.</p></div>
+        <button id="clear" class="secondary" type="button">Bersihkan</button>
+      </div>
+      <ul id="feed" class="feed"></ul>
+      <div id="empty" class="empty"><div class="empty-symbol">↔</div><h3>Belum ada pesan</h3><p class="muted">Kirim pesan ke nomor engine untuk melihatnya muncul di sini.</p></div>
+    </section>
+
+    <footer>NC-WA <span>Riwayat hanya di browser · Engine tidak menyimpan pesan</span></footer>
+  </main>
+</body>
+</html>

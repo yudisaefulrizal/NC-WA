@@ -44,6 +44,7 @@ Dashboard internal, satu pemilik, dibuka pakai API key dari env.
 - [x] Halaman dokumentasi API
 - [x] Statistik (dibaca saat UI dibuka, tidak disimpan)
 - [x] Atur filter pribadi / grup per session
+- [x] Halaman uji: aliran pesan realtime + kirim pesan (riwayat di browser)
 
 Tanpa user, tanpa login, tanpa manajemen key.
 Satu instalasi = satu pemilik. Orang lain instal sendiri.
@@ -366,6 +367,25 @@ gunakan URL yang dikembalikan webhook. Wajib `X-API-Key`.
 Media masuk disimpan engine ke disk, webhook cuma kirim URL-nya.
 Bukan base64 — video besar boros memori, dan memori lebih mahal daripada disk.
 File dihapus otomatis setelah `MEDIA_RETENTION_DAYS` (default 7).
+
+---
+
+## Aliran pesan realtime
+
+`GET /events` — Server-Sent Events. Mendorong event yang sama dengan
+webhook (`message`, `session.status`, `session.qr`) ke pemanggil yang
+sedang terhubung.
+
+Engine tidak menyimpan apa pun untuk ini: event yang lewat saat tidak
+ada pemanggil terhubung, hilang. Dipakai halaman uji di dashboard —
+riwayatnya disimpan di browser, bukan di engine.
+
+Wajib `X-API-Key`. Karena EventSource tidak bisa mengirim header,
+endpoint ini juga menerima key lewat query `?key=`.
+
+Halaman uji menampilkan isi percakapan di layar. Dapat diterima karena
+dashboard single-tenant dan terlindungi API key, tapi jangan dibuka di
+layar yang terlihat orang lain.
 
 ---
 
