@@ -53,13 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 2 — Kirim
-**Sedang dikerjakan:** kirim teks
+**Sedang dikerjakan:** kirim media dan caption
 
 **Sudah selesai:**
-- Tahap 1; 13 tes dan build lolos
-- Pemilik berhasil scan; restart engine terbukti connected tanpa scan ulang
+- Tahap 1 dan API kirim teks
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** kirim teks, media, pribadi/grup, queue
+**Berikutnya:** kirim media dan caption

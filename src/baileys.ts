@@ -35,6 +35,12 @@ export function baileysConnector(store: SessionStore): Connector {
       }
     });
     return {
+      async exists(jid) { return Boolean((await socket.onWhatsApp(jid))?.some(result => result.exists)); },
+      async send(jid, content) {
+        const message = await socket.sendMessage(jid, content);
+        if (!message?.key.id) throw new Error('WhatsApp tidak memberikan ID pesan');
+        return message.key.id;
+      },
       async close() { qrGeneration++; socket.ev.removeAllListeners('connection.update'); socket.end(undefined); await saves; },
       async logout() { await socket.logout(); await saves; },
     };

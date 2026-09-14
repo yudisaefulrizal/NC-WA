@@ -1,3 +1,4 @@
+import type { Outbound } from './messages.js';
 import type { SessionStore } from './store.js';
 export type Status = 'qr_required' | 'connecting' | 'connected' | 'logged_out';
 export interface SessionInfo {
@@ -12,6 +13,8 @@ export class ApiError extends Error {
 export interface Connection {
   close(): void | Promise<void>;
   logout(): Promise<void>;
+  send?(jid: string, content: Outbound): Promise<string>;
+  exists?(jid: string): Promise<boolean>;
 }
 export interface Update { status?: Status; phone?: string; qr?: string; disconnected?: number }
 export type Connector = (id: string, update: (event: Update) => void) => Promise<Connection>;
@@ -74,6 +77,25 @@ export class SessionManager {
     try { await session.opening; }
     catch (error) { this.sessions.delete(id); throw error; }
     return this.detail(id);
+  }
+  connected(id: string) {
+    const session = this.get(id);
+    if (this.stopped || session.suspended || session.status !== 'connected' || !session.connection) {
+      throw new ApiError(409, 'session_not_connected', `Session ${id} belum tersambung`);
+    }
+    return session.connection;
+  }
+  async send(id: string, jid: string, content: Outbound) {
+    const connection = this.connected(id);
+    try {
+      if (connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
+      if (!connection.send) throw new Error('Transport tidak mendukung pengiriman');
+      const messageId = await connection.send(jid, content);
+      return { messageId, to: jid };
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      throw new ApiError(502, 'send_failed', 'Gagal mengirim ke WhatsApp');
+    }
   }
   private async mutate<T>(id: string, action: (session: Session) => Promise<T>): Promise<T> {
     const session = this.get(id);
