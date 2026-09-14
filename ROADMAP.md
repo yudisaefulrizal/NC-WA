@@ -79,7 +79,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] Validasi URL media keluar
 - [x] Hapus media otomatis (`MEDIA_RETENTION_DAYS`)
 - [x] Log per session
-- [ ] `.env.example` + langkah instal
+- [x] `.env.example` + langkah instal
 - [ ] README — apa ini, catatan risiko ToS, cara instal,
       cara pasang nomor pertama, tunjuk ke SPEC.md untuk API
 
