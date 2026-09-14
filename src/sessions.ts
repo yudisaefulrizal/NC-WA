@@ -88,7 +88,7 @@ export class SessionManager {
   async send(id: string, jid: string, content: Outbound) {
     const connection = this.connected(id);
     try {
-      if (connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
+      if (!jid.endsWith('@g.us') && connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
       if (!connection.send) throw new Error('Transport tidak mendukung pengiriman');
       const messageId = await connection.send(jid, content);
       return { messageId, to: jid };

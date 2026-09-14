@@ -11,6 +11,7 @@ export function requiredString(value: unknown, name: string, max = 65536): strin
 }
 export function recipient(value: unknown): string {
   const to = requiredString(value, 'to', 80);
+  if (/^[0-9]+(?:-[0-9]+)?@g\.us$/.test(to)) return to;
   if (!/^[1-9][0-9]{5,14}$/.test(to)) throw new ApiError(400, 'invalid_request', 'to harus nomor internasional tanpa +');
   return `${to}@s.whatsapp.net`;
 }
