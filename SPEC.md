@@ -22,6 +22,27 @@ Broadcast/kontak/jadwal → urusan aplikasi pemakai.
 - [x] Webhook ke aplikasi pemakai
 - [x] Webhook status session
 - [x] Retry webhook kalau gagal
+- [ ] Daftarkan webhook lewat API, bukan hanya `.env`
+
+### Webhook lewat API
+
+`WEBHOOK_URL` di `.env` tetap ada dan tetap jalan — itu webhook tetap,
+cocok untuk satu aplikasi client yang selalu sama.
+
+Yang ditambahkan: client boleh mendaftarkan URL-nya sendiri lewat API,
+disimpan di disk, dan bertahan setelah restart. Alasannya ada dua:
+
+**Satu engine bisa melayani banyak client.** Sekarang satu nilai
+`WEBHOOK_URL` berarti satu tujuan. Aplikasi kedua terpaksa dilayani
+lewat penerusan di sisi client.
+
+**Alat otomasi mendaftar sendiri.** Node n8n mengetahui URL webhook-nya
+hanya setelah workflow dibuat, dan URL uji berbeda dari URL produksi.
+Tanpa API, tiap perpindahan berarti menyunting `.env` dan menjalankan
+ulang engine — di produksi itu memutus semua session sesaat.
+
+Yang tidak berubah: bentuk payload, retry, dan urutan pengiriman.
+Webhook `.env` dan webhook terdaftar sama-sama menerima kiriman.
 
 ## Presence
 - [x] Tandai dibaca
@@ -403,8 +424,37 @@ layar yang terlihat orang lain.
 
 ## Webhook
 
-Engine POST ke `WEBHOOK_URL` dari env. Satu URL untuk semua session.
+Engine POST ke `WEBHOOK_URL` dari env, dan ke tiap URL yang didaftarkan
+lewat API. Semuanya menerima kiriman yang sama.
 Kalau gagal, coba ulang 3x dengan jeda.
+
+### Kelola langganan
+
+```
+GET    /webhooks          daftar langganan
+POST   /webhooks          daftarkan URL       { "url": "...", "sessionId": "..." }
+DELETE /webhooks/:id      cabut langganan
+```
+
+`sessionId` opsional; tanpa itu langganan menerima event semua session.
+
+`POST` dengan URL yang sudah terdaftar tidak membuat duplikat — kembalikan
+langganan yang ada. Ini membuat pendaftaran aman diulang, yang dibutuhkan
+alat otomatis yang mendaftar tiap kali workflow diaktifkan.
+
+```json
+{ "id": "wh_a1b2c3", "url": "https://n8n.example.com/webhook/abc", "sessionId": null }
+```
+
+URL wajib `http:` atau `https:`, dan ditolak kalau menunjuk alamat lokal —
+aturan yang sama dengan URL media keluar, supaya engine tidak bisa disuruh
+menembak alamat internal server.
+
+Langganan disimpan di disk, bertahan setelah restart. Batas 20 langganan;
+di luar itu ditolak `too_many_webhooks`.
+
+Webhook dari `.env` tidak muncul di daftar dan tidak bisa dicabut lewat
+API — itu milik pemasang engine, bukan milik client.
 
 ### Pesan masuk
 ```json

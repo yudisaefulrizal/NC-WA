@@ -90,6 +90,37 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 - [x] [agent] File media lewat masa retensi → terhapus
 - [x] [manual] Instal dari nol di server lain, ikuti README apa adanya
 
+## 7. Webhook lewat API
+
+Supaya client bisa mendaftarkan URL-nya sendiri tanpa menyunting `.env`
+dan menjalankan ulang engine. Pemicunya: node n8n baru tahu URL
+webhook-nya setelah workflow dibuat, dan URL uji berbeda dari URL
+produksi.
+
+- [ ] Simpan langganan webhook di disk (pola tulis atomik seperti session)
+- [ ] `GET /webhooks`, `POST /webhooks`, `DELETE /webhooks/:id`
+- [ ] Kirim ke semua langganan + `WEBHOOK_URL` dari env
+- [ ] Saring per session kalau langganan menyebut `sessionId`
+- [ ] Validasi URL: http/https, tolak alamat lokal
+- [ ] Batas 20 langganan
+- [ ] Muat ulang langganan waktu engine start
+
+**Uji**
+- [ ] [agent] Daftar URL lalu pesan masuk → URL itu menerima payload
+- [ ] [agent] Daftar URL yang sama dua kali → tidak jadi dua langganan
+- [ ] [agent] Langganan dengan `sessionId` hanya menerima event session itu
+- [ ] [agent] URL ke alamat lokal ditolak
+- [ ] [agent] URL bukan http/https ditolak
+- [ ] [agent] Langganan ke-21 ditolak `too_many_webhooks`
+- [ ] [agent] Cabut langganan → tidak menerima kiriman lagi
+- [ ] [agent] Langganan bertahan setelah engine dimuat ulang
+- [ ] [agent] Satu langganan gagal tidak menghentikan kiriman ke yang lain
+- [ ] [agent] `WEBHOOK_URL` env tetap menerima, tidak muncul di `GET /webhooks`
+- [ ] [manual] Trigger n8n mendaftar sendiri waktu workflow diaktifkan,
+      lalu pesan dari HP menjalankan workflow tanpa menyentuh `.env`
+
+---
+
 ---
 
 Halaman QR ikut tahap 1 karena dibutuhkan untuk menguji semua tahap

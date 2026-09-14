@@ -64,5 +64,11 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 - Diakses lewat Cloudflare Tunnel dengan HTTPS; port tidak dibuka
 - Kirim dan terima pesan terkonfirmasi di server
 
-**Berikutnya:** tidak ada pekerjaan tertunda. Lanjutan bergantung
-kebutuhan aplikasi client.
+**Berikutnya:** tahap 7 — webhook lewat API. Belum dikerjakan, baru
+direncanakan di [ROADMAP.md](ROADMAP.md) dan [SPEC.md](SPEC.md).
+
+Pemicunya dari sisi client: node n8n (`../n8n-nc-wa`) baru mengetahui URL
+webhook-nya setelah workflow dibuat, dan URL uji berbeda dari URL
+produksi. Dengan hanya `WEBHOOK_URL` di `.env`, tiap perpindahan menuntut
+penyuntingan berkas dan menjalankan ulang engine — di produksi itu
+memutus semua session sesaat.
