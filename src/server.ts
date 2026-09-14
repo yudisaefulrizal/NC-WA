@@ -13,7 +13,12 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT h
 const store = new SessionStore(resolve(process.env.AUTH_DIR ?? 'auth'));
 const manager = new SessionManager(baileysConnector(store), store);
 const webhook = new Webhook(process.env.WEBHOOK_URL);
-const media = new MediaStore(resolve(process.env.MEDIA_DIR ?? 'data/media'), process.env.BASE_URL ?? `http://127.0.0.1:${port}`);
+const retentionDays = Number(process.env.MEDIA_RETENTION_DAYS ?? 7);
+if (!Number.isFinite(retentionDays) || retentionDays <= 0) throw new Error('MEDIA_RETENTION_DAYS harus angka positif');
+const media = new MediaStore(resolve(process.env.MEDIA_DIR ?? 'data/media'), process.env.BASE_URL ?? `http://127.0.0.1:${port}`, 32 * 1024 * 1024, retentionDays);
+await media.prune();
+const cleanupTimer = setInterval(() => { void media.prune().catch(() => console.log(`${new Date().toISOString()} Gagal membersihkan media`)); }, 3600_000);
+cleanupTimer.unref();
 manager.onEvent = event => webhook.post(event);
 manager.onIncoming = async (session, incoming) => {
   const { download: _download, mimetype: _mimetype, ...message } = incoming;
@@ -27,6 +32,7 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {
     server.close();
     webhook.stop();
+    clearInterval(cleanupTimer);
     void manager.stop().then(() => process.exit(0));
   });
 }

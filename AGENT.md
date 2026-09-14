@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 6 — Rapikan
-**Sedang dikerjakan:** retensi media otomatis
+**Sedang dikerjakan:** perapian log per session
 
 **Sudah selesai:**
-- Tahap 1–5, batas body dan URL media publik tervalidasi
+- Tahap 1–5 dan keamanan/retensi media
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** retensi media otomatis
+**Berikutnya:** perapian log per session
