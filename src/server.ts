@@ -1,3 +1,4 @@
+import { MediaStore } from './media.js';
 import { Webhook } from './webhook.js';
 import { resolve } from 'node:path';
 import { createApp } from './app.js';
@@ -12,13 +13,14 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT h
 const store = new SessionStore(resolve(process.env.AUTH_DIR ?? 'auth'));
 const manager = new SessionManager(baileysConnector(store), store);
 const webhook = new Webhook(process.env.WEBHOOK_URL);
+const media = new MediaStore(resolve(process.env.MEDIA_DIR ?? 'data/media'), process.env.BASE_URL ?? `http://127.0.0.1:${port}`);
 manager.onEvent = event => webhook.post(event);
 manager.onIncoming = async (session, incoming) => {
   const { download: _download, mimetype: _mimetype, ...message } = incoming;
-  await webhook.post({ event: 'message', sessionId: session.id, ...message, media: null });
+  await webhook.post({ event: 'message', sessionId: session.id, ...message, media: await media.save(session.id, incoming) });
 };
 await manager.restore();
-const server = createApp(manager, apiKey).listen(port, process.env.HOST ?? '127.0.0.1', () => {
+const server = createApp(manager, apiKey, media).listen(port, process.env.HOST ?? '127.0.0.1', () => {
   console.log(`${new Date().toISOString()} Engine mendengarkan port ${port}`);
 });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {

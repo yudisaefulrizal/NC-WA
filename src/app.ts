@@ -1,15 +1,24 @@
+import type { MediaStore } from './media.js';
 import express from 'express';
 import { sendText, sendMedia } from './messages.js';
 import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
 
-export function createApp(manager: SessionManager, apiKey: string) {
+export function createApp(manager: SessionManager, apiKey: string, media?: MediaStore) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.get('/media/:id', async (req, res) => {
+    if (!media) throw new ApiError(404, 'media_not_found', 'Media tidak ada');
+    const file = await media.get(req.params.id);
+    res.setHeader('Content-Type', file.mimetype);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Disposition', 'attachment');
+    res.sendFile(file.path);
+  });
   app.post('/sessions/:id/messages/media', async (req, res) => res.json(await sendMedia(manager, req.params.id, req.body)));
   app.post('/sessions/:id/messages/text', async (req, res) => res.json(await sendText(manager, req.params.id, req.body)));
   app.post('/sessions', async (req, res) => {
