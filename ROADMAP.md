@@ -17,8 +17,8 @@ Acuan: [SPEC.md](SPEC.md) — aturan kerja: [AGENT.md](AGENT.md)
 - [x] [agent] Request tanpa API key ditolak 401
 - [x] [agent] Session id ganda ditolak 409
 - [x] [agent] `GET /sessions/:id` untuk id tidak ada → 404
-- [manual] Scan QR dari HP → status jadi `connected`
-- [manual] Restart engine → masih connected, tidak minta scan ulang
+- [x] [manual] Scan QR dari HP → status jadi `connected`
+- [x] [manual] Restart engine → masih connected, tidak minta scan ulang
 - [manual] Matikan wifi lalu nyalakan → reconnect sendiri
 - [manual] Hapus device dari HP → status `logged_out`, tidak loop reconnect
 

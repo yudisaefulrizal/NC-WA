@@ -52,14 +52,14 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 1 — Fondasi
-**Sedang dikerjakan:** menunggu gerbang uji manual tahap 1
+**Tahap:** 2 — Kirim
+**Sedang dikerjakan:** kirim teks
 
 **Sudah selesai:**
-- Seluruh implementasi tahap 1; 13 tes otomatis, build, dan QR WhatsApp nyata lolos
+- Tahap 1; 13 tes dan build lolos
+- Pemilik berhasil scan; restart engine terbukti connected tanpa scan ulang
 
 **Menunggu pemilik:**
-- Scan QR hingga connected; restart engine tetap connected tanpa scan ulang
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** uji manual scan QR dan restart sebelum tahap 2
+**Berikutnya:** kirim teks, media, pribadi/grup, queue
