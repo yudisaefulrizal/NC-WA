@@ -1,4 +1,4 @@
-import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, type AnyMessageContent } from '@whiskeysockets/baileys';
 import QRCode from 'qrcode';
 import { join } from 'node:path';
 import type { Connector } from './sessions.js';
@@ -37,7 +37,18 @@ export function baileysConnector(store: SessionStore): Connector {
     return {
       async exists(jid) { return Boolean((await socket.onWhatsApp(jid))?.some(result => result.exists)); },
       async send(jid, content) {
-        const message = await socket.sendMessage(jid, content);
+        let outgoing: AnyMessageContent;
+        if ('text' in content) outgoing = content;
+        else {
+          const media = { url: content.url };
+          switch (content.type) {
+            case 'image': outgoing = { image: media, caption: content.caption }; break;
+            case 'video': outgoing = { video: media, caption: content.caption }; break;
+            case 'audio': outgoing = { audio: media, mimetype: 'audio/mpeg' }; break;
+            case 'document': outgoing = { document: media, caption: content.caption, fileName: content.filename ?? 'document', mimetype: 'application/octet-stream' }; break;
+          }
+        }
+        const message = await socket.sendMessage(jid, outgoing);
         if (!message?.key.id) throw new Error('WhatsApp tidak memberikan ID pesan');
         return message.key.id;
       },

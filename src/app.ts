@@ -1,5 +1,5 @@
 import express from 'express';
-import { sendText } from './messages.js';
+import { sendText, sendMedia } from './messages.js';
 import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
@@ -10,6 +10,7 @@ export function createApp(manager: SessionManager, apiKey: string) {
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
   app.use(apiKeyAuth(apiKey));
   app.use(express.json({ limit: '64kb' }));
+  app.post('/sessions/:id/messages/media', async (req, res) => res.json(await sendMedia(manager, req.params.id, req.body)));
   app.post('/sessions/:id/messages/text', async (req, res) => res.json(await sendText(manager, req.params.id, req.body)));
   app.post('/sessions', async (req, res) => {
     const { id, status } = await manager.create(req.body?.id);

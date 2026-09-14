@@ -26,7 +26,7 @@ Gerbang: dua tes manual pertama harus lewat sebelum tahap 2.
 
 ## 2. Kirim
 - [x] Kirim teks
-- [ ] Kirim media + caption
+- [x] Kirim media + caption
 - [ ] Ke pribadi dan grup
 - [ ] Queue + jeda antar pesan
 

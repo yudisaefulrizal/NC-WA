@@ -53,12 +53,12 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 ## Status
 
 **Tahap:** 2 — Kirim
-**Sedang dikerjakan:** kirim media dan caption
+**Sedang dikerjakan:** tujuan pribadi dan grup
 
 **Sudah selesai:**
-- Tahap 1 dan API kirim teks
+- Tahap 1, API teks dan media
 
 **Menunggu pemilik:**
 - Uji putus jaringan dan pencabutan device dari HP
 
-**Berikutnya:** kirim media dan caption
+**Berikutnya:** tujuan pribadi dan grup
