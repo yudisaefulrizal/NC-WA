@@ -7,6 +7,7 @@ import { baileysConnector } from './baileys.js';
 import { SessionManager } from './sessions.js';
 import { SessionStore } from './store.js';
 import { EventStream } from './events.js';
+import { Subscriptions } from './subscriptions.js';
 
 const apiKey = process.env.API_KEY ?? '';
 if (!apiKey.trim()) throw new Error('API_KEY wajib diisi di .env');
@@ -16,7 +17,9 @@ const store = new SessionStore(resolve(process.env.AUTH_DIR ?? 'auth'));
 const intervalMs = Number(process.env.SEND_INTERVAL_MS ?? 1000);
 if (!Number.isFinite(intervalMs) || intervalMs < 0) throw new Error('SEND_INTERVAL_MS harus angka nonnegatif');
 const manager = new SessionManager(baileysConnector(store), store, 1000, intervalMs);
-const webhook = new Webhook(process.env.WEBHOOK_URL);
+const webhooks = new Subscriptions(resolve(process.env.WEBHOOK_FILE ?? 'data/webhooks.json'));
+await webhooks.load();
+const webhook = new Webhook(process.env.WEBHOOK_URL, undefined, undefined, payload => webhooks.targets(payload.sessionId));
 const events = new EventStream();
 const retentionDays = Number(process.env.MEDIA_RETENTION_DAYS ?? 7);
 if (!Number.isFinite(retentionDays) || retentionDays <= 0) throw new Error('MEDIA_RETENTION_DAYS harus angka positif');
@@ -34,7 +37,7 @@ manager.onIncoming = async (session, incoming) => {
   await webhook.post(payload);
 };
 await manager.restore();
-const server = createApp(manager, apiKey, media, events).listen(port, process.env.HOST ?? '127.0.0.1', () => {
+const server = createApp(manager, apiKey, media, events, webhooks).listen(port, process.env.HOST ?? '127.0.0.1', () => {
   log(undefined, `Engine mendengarkan port ${port}`);
 });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
@@ -42,6 +45,7 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
     server.close();
     webhook.stop();
     events.stop();
+    void webhooks.flush();
     clearInterval(cleanupTimer);
     void manager.stop().then(() => process.exit(0));
   });

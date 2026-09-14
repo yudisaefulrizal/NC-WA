@@ -22,7 +22,7 @@ Broadcast/kontak/jadwal → urusan aplikasi pemakai.
 - [x] Webhook ke aplikasi pemakai
 - [x] Webhook status session
 - [x] Retry webhook kalau gagal
-- [ ] Daftarkan webhook lewat API, bukan hanya `.env`
+- [x] Daftarkan webhook lewat API, bukan hanya `.env`
 
 ### Webhook lewat API
 
@@ -146,6 +146,7 @@ session yang sama. Jangan PM2 cluster mode, jangan scaling horizontal.
 **Folder yang harus permanen** (selamat waktu restart / redeploy):
 - auth state per session
 - media masuk
+- berkas langganan webhook (`WEBHOOK_FILE`)
 
 Kalau pakai Docker, ini volume. Kalau tidak, jangan taruh di direktori
 yang tertimpa waktu update.
@@ -156,7 +157,11 @@ API_KEY=
 WEBHOOK_URL=
 PORT=8066
 MEDIA_RETENTION_DAYS=7
+WEBHOOK_FILE=data/webhooks.json
 ```
+
+`WEBHOOK_FILE` menyimpan langganan yang didaftarkan lewat API. Ikut daftar
+folder permanen di atas — hilang berarti semua client harus mendaftar ulang.
 
 **Kebutuhan server.** Node 22+, 1 core, disk lokal. RAM yang menentukan:
 ~150 MB per session, bertambah mengikuti jumlah kontak dan anggota grup

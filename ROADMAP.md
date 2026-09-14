@@ -97,25 +97,25 @@ dan menjalankan ulang engine. Pemicunya: node n8n baru tahu URL
 webhook-nya setelah workflow dibuat, dan URL uji berbeda dari URL
 produksi.
 
-- [ ] Simpan langganan webhook di disk (pola tulis atomik seperti session)
-- [ ] `GET /webhooks`, `POST /webhooks`, `DELETE /webhooks/:id`
-- [ ] Kirim ke semua langganan + `WEBHOOK_URL` dari env
-- [ ] Saring per session kalau langganan menyebut `sessionId`
-- [ ] Validasi URL: http/https, tolak alamat lokal
-- [ ] Batas 20 langganan
-- [ ] Muat ulang langganan waktu engine start
+- [x] Simpan langganan webhook di disk (pola tulis atomik seperti session)
+- [x] `GET /webhooks`, `POST /webhooks`, `DELETE /webhooks/:id`
+- [x] Kirim ke semua langganan + `WEBHOOK_URL` dari env
+- [x] Saring per session kalau langganan menyebut `sessionId`
+- [x] Validasi URL: http/https, tolak alamat lokal
+- [x] Batas 20 langganan
+- [x] Muat ulang langganan waktu engine start
 
 **Uji**
-- [ ] [agent] Daftar URL lalu pesan masuk → URL itu menerima payload
-- [ ] [agent] Daftar URL yang sama dua kali → tidak jadi dua langganan
-- [ ] [agent] Langganan dengan `sessionId` hanya menerima event session itu
-- [ ] [agent] URL ke alamat lokal ditolak
-- [ ] [agent] URL bukan http/https ditolak
-- [ ] [agent] Langganan ke-21 ditolak `too_many_webhooks`
-- [ ] [agent] Cabut langganan → tidak menerima kiriman lagi
-- [ ] [agent] Langganan bertahan setelah engine dimuat ulang
-- [ ] [agent] Satu langganan gagal tidak menghentikan kiriman ke yang lain
-- [ ] [agent] `WEBHOOK_URL` env tetap menerima, tidak muncul di `GET /webhooks`
+- [x] [agent] Daftar URL lalu pesan masuk → URL itu menerima payload
+- [x] [agent] Daftar URL yang sama dua kali → tidak jadi dua langganan
+- [x] [agent] Langganan dengan `sessionId` hanya menerima event session itu
+- [x] [agent] URL ke alamat lokal ditolak
+- [x] [agent] URL bukan http/https ditolak
+- [x] [agent] Langganan ke-21 ditolak `too_many_webhooks`
+- [x] [agent] Cabut langganan → tidak menerima kiriman lagi
+- [x] [agent] Langganan bertahan setelah engine dimuat ulang
+- [x] [agent] Satu langganan gagal tidak menghentikan kiriman ke yang lain
+- [x] [agent] `WEBHOOK_URL` env tetap menerima, tidak muncul di `GET /webhooks`
 - [ ] [manual] Trigger n8n mendaftar sendiri waktu workflow diaktifkan,
       lalu pesan dari HP menjalankan workflow tanpa menyentuh `.env`
 

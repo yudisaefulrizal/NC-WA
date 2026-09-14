@@ -52,7 +52,7 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** selesai — engine jalan di produksi
+**Tahap:** 7 — webhook lewat API. Uji `[agent]` lulus, menunggu uji manual.
 
 **Sudah selesai:**
 - Seluruh tahap 1–6; 33 tes, build, dan tipe lolos
@@ -64,11 +64,10 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 - Diakses lewat Cloudflare Tunnel dengan HTTPS; port tidak dibuka
 - Kirim dan terima pesan terkonfirmasi di server
 
-**Berikutnya:** tahap 7 — webhook lewat API. Belum dikerjakan, baru
-direncanakan di [ROADMAP.md](ROADMAP.md) dan [SPEC.md](SPEC.md).
+- Tahap 7: `GET/POST/DELETE /webhooks`, langganan disimpan di
+  `WEBHOOK_FILE` dan bertahan setelah restart; 57 tes lulus (33 lama +
+  24 baru), build dan tipe lolos
 
-Pemicunya dari sisi client: node n8n (`../n8n-nc-wa`) baru mengetahui URL
-webhook-nya setelah workflow dibuat, dan URL uji berbeda dari URL
-produksi. Dengan hanya `WEBHOOK_URL` di `.env`, tiap perpindahan menuntut
-penyuntingan berkas dan menjalankan ulang engine — di produksi itu
-memutus semua session sesaat.
+**Berikutnya:** uji manual tahap 7 — trigger n8n mendaftar sendiri waktu
+workflow diaktifkan. Butuh perubahan di sisi node (`../n8n-nc-wa`), yaitu
+`webhookMethods` pada trigger, yang akan jadi rilis `0.3.0`.

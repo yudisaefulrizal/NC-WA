@@ -6,8 +6,9 @@ import { apiKeyAuth } from './auth.js';
 import { fileURLToPath } from 'node:url';
 import { ApiError, type SessionManager } from './sessions.js';
 import type { EventStream } from './events.js';
+import type { Subscriptions } from './subscriptions.js';
 
-export function createApp(manager: SessionManager, apiKey: string, media?: MediaStore, events?: EventStream) {
+export function createApp(manager: SessionManager, apiKey: string, media?: MediaStore, events?: EventStream, webhooks?: Subscriptions) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
@@ -15,6 +16,11 @@ export function createApp(manager: SessionManager, apiKey: string, media?: Media
   app.use(express.json({ limit: '64kb' }));
   if (events) app.get('/events', events.handler);
   app.get('/stats', (_req, res) => res.json(manager.stats()));
+  if (webhooks) {
+    app.get('/webhooks', (_req, res) => res.json(webhooks.list()));
+    app.post('/webhooks', async (req, res) => res.json(await webhooks.add(req.body)));
+    app.delete('/webhooks/:id', async (req, res) => res.json(await webhooks.remove(req.params.id)));
+  }
   app.post('/sessions/:id/typing', async (req, res) => {
     const input = object(req.body);
     res.json(await manager.typing(req.params.id, recipient(input.to), input.state));

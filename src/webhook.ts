@@ -1,16 +1,37 @@
 import { log } from './log.js';
 import { setTimeout } from 'node:timers/promises';
+
+export type Payload = { event: string; sessionId: string; [key: string]: unknown };
+
 export class Webhook {
   private abort = new AbortController();
-  constructor(private url = '', private send: typeof fetch = fetch, private retryMs = 1000) {
+
+  /**
+   * `url` adalah webhook tetap dari env. `extra` menyumbang URL yang
+   * didaftarkan client lewat API, dibaca tiap kirim supaya perubahan
+   * langganan langsung berlaku tanpa menjalankan ulang engine.
+   */
+  constructor(
+    private url = '',
+    private send: typeof fetch = fetch,
+    private retryMs = 1000,
+    private extra: (payload: Payload) => string[] = () => [],
+  ) {
     if (url && !['http:', 'https:'].includes(new URL(url).protocol)) throw new Error('WEBHOOK_URL harus HTTP atau HTTPS');
   }
-  async post(payload: { event: string; sessionId: string; [key: string]: unknown }) {
-    if (!this.url) return;
+
+  async post(payload: Payload) {
+    const targets = [...new Set([...(this.url ? [this.url] : []), ...this.extra(payload)])];
+    if (!targets.length) return;
+    // Satu tujuan yang mati tidak boleh menahan yang lain.
+    await Promise.all(targets.map(target => this.deliver(target, payload)));
+  }
+
+  private async deliver(target: string, payload: Payload) {
     for (let attempt = 0; attempt <= 3; attempt++) {
       if (this.abort.signal.aborted) return;
       try {
-        const response = await this.send(this.url, {
+        const response = await this.send(target, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload), redirect: 'error',
           signal: AbortSignal.any([this.abort.signal, AbortSignal.timeout(10_000)]),
@@ -26,5 +47,6 @@ export class Webhook {
       }
     }
   }
+
   stop() { this.abort.abort(); }
 }
