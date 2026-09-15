@@ -128,12 +128,15 @@ berikutnya. Sisa UI paling belakang.
 
 ## Hasil verifikasi terakhir
 
-- `npm run check`, `npm test` (28 tes), dan `npm run build`: lulus.
+- `npm run check`, `npm test` (57 tes), dan `npm run build`: lulus.
 - Browser otomatis dengan data tiruan: daftar session, filter, logout, hapus,
   dokumentasi dan viewport mobile lulus tanpa error JavaScript.
 - Scan QR dikonfirmasi pemilik; restart engine terbaru terbukti kembali connected.
 - Smoke HTTP server terbaru: dashboard/QR/dokumentasi/statistik 200, API tanpa key 401.
-- Pemilik mengonfirmasi pesan masuk ke nomor yang login; webhook belum terkonfirmasi.
+- Pemilik mengonfirmasi pesan masuk ke nomor yang login.
+- Webhook terkonfirmasi lewat node n8n: pesan masuk menjalankan workflow,
+  dan langganan didaftarkan sendiri lewat `POST /webhooks` tanpa menyentuh
+  `.env`.
 - Satu uji kirim teks nyata melalui toko-a menghasilkan HTTP 200 dan messageId.
   Pemilik mengonfirmasi teks berhasil terkirim dan diterima di HP tujuan.
   Tes manual lainnya tetap menunggu.

@@ -60,3 +60,25 @@ yang sama muncul lagi, catatannya sudah ada.
 - Status: selesai — proses lama dimatikan.
 - Menyusul: engine sebaiknya berhenti dengan pesan jelas kalau port
   sudah dipakai, bukan diam. Lihat catatan di ROADMAP tahap 6.
+
+## Perubahan kode tidak berlaku setelah `git pull` dan `npm run build` di server
+
+- Coba 1: `git pull` sebagai root → ditolak `dubious ownership` karena
+  folder milik `www`. Yang menyesatkan: `npm install` dan `npm run build`
+  setelahnya tetap jalan dan terlihat sukses, padahal yang dibangun masih
+  kode lama. Perbaikannya
+  `git config --global --add safe.directory /www/wwwroot/NC-WA`.
+- Coba 2: pull berhasil dan build lulus, tapi endpoint baru tetap
+  `not_found` → proses lama masih memegang kode lama di memori.
+- Terbukti bukan penyebabnya: `.env`, hasil build, dan kepemilikan berkas
+  semuanya benar; engine menjawab `not_found` (bukan menolak koneksi),
+  jadi ia hidup dan API key-nya sah.
+- Status: selesai — engine harus dijalankan ulang, bukan sekadar
+  dibangun. Tombol restart aaPanel tidak menghentikan prosesnya; PID-nya
+  tidak berubah. Yang berhasil: `kill <pid>` lalu nyalakan lagi dari
+  panel.
+
+  Sesudah `kill`, panel **tidak** menghidupkannya sendiri. Jangan tinggalkan
+  engine mati — nyalakan lagi lewat panel supaya tetap dikelola panel dan
+  ikut hidup waktu server reboot. Menjalankan lewat `nohup` manual memang
+  bisa, tapi hilang setelah reboot.
