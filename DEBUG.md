@@ -74,11 +74,9 @@ yang sama muncul lagi, catatannya sudah ada.
   semuanya benar; engine menjawab `not_found` (bukan menolak koneksi),
   jadi ia hidup dan API key-nya sah.
 - Status: selesai — engine harus dijalankan ulang, bukan sekadar
-  dibangun. Tombol restart aaPanel tidak menghentikan prosesnya; PID-nya
-  tidak berubah. Yang berhasil: `kill <pid>` lalu nyalakan lagi dari
-  panel.
+  dibangun. Restart dari aaPanel. Cek berhasil lewat PID: kalau tidak
+  berubah, restartnya belum kena.
 
-  Sesudah `kill`, panel **tidak** menghidupkannya sendiri. Jangan tinggalkan
-  engine mati — nyalakan lagi lewat panel supaya tetap dikelola panel dan
-  ikut hidup waktu server reboot. Menjalankan lewat `nohup` manual memang
-  bisa, tapi hilang setelah reboot.
+  Kalau prosesnya dimatikan manual dengan `kill`, panel tidak
+  menghidupkannya sendiri — nyalakan lagi dari panel, jangan dibiarkan
+  jalan lewat `nohup` karena itu hilang setelah server reboot.

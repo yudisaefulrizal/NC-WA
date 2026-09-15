@@ -50,6 +50,26 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ---
 
+## Deploy ke server
+
+Sebagai root di `/www/wwwroot/NC-WA`:
+
+```
+git pull origin main
+npm install
+npm run build
+```
+
+Lalu restart dari aaPanel. Cek dengan `ps aux | grep "node.*server"` —
+PID harus berubah.
+
+Kalau `git pull` menolak dengan `dubious ownership`, jalankan sekali:
+`git config --global --add safe.directory /www/wwwroot/NC-WA`. Perhatikan
+bahwa build sesudahnya tetap sukses walau pull-nya gagal, jadi pastikan
+pull benar-benar jalan.
+
+---
+
 ## Status
 
 **Tahap:** 7 selesai — webhook lewat API jalan di server.
