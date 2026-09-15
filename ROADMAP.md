@@ -116,7 +116,7 @@ produksi.
 - [x] [agent] Langganan bertahan setelah engine dimuat ulang
 - [x] [agent] Satu langganan gagal tidak menghentikan kiriman ke yang lain
 - [x] [agent] `WEBHOOK_URL` env tetap menerima, tidak muncul di `GET /webhooks`
-- [ ] [manual] Trigger n8n mendaftar sendiri waktu workflow diaktifkan,
+- [x] [manual] Trigger n8n mendaftar sendiri waktu workflow diaktifkan,
       lalu pesan dari HP menjalankan workflow tanpa menyentuh `.env`
 
 ---

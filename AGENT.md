@@ -52,7 +52,7 @@ dan kredensial WhatsApp. Pastikan `.gitignore` terpasang sebelum
 
 ## Status
 
-**Tahap:** 7 — webhook lewat API. Uji `[agent]` lulus, menunggu uji manual.
+**Tahap:** 7 selesai — webhook lewat API jalan di server.
 
 **Sudah selesai:**
 - Seluruh tahap 1–6; 33 tes, build, dan tipe lolos
