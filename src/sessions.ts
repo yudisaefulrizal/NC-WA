@@ -125,31 +125,39 @@ export class SessionManager {
   }
   connected(id: string) {
     const session = this.get(id);
-    if (this.stopped || session.suspended || session.status !== 'connected' || !session.connection) {
-      throw new ApiError(409, 'session_not_connected', `Session ${id} belum tersambung`);
-    }
+    if (this.stopped) throw new ApiError(503, 'unavailable', 'Engine sedang berhenti');
+    if (session.suspended) throw new ApiError(409, 'session_suspended', `Session ${id} sedang ditangguhkan`);
+    if (session.status !== 'connected') throw new ApiError(409, 'session_not_connected', `Session ${id} belum tersambung (status: ${session.status})`);
+    if (!session.connection) throw new ApiError(409, 'session_not_connected', `Session ${id} tidak memiliki koneksi aktif`);
     return session.connection;
   }
   async send(id: string, jid: string, content: Outbound) {
+    log(id, `Request kirim pesan ke ${jid}`);
     this.connected(id);
     const session = this.get(id);
     let queue = this.queues.get(session);
     if (!queue) { queue = new SendQueue(this.sendIntervalMs); this.queues.set(session, queue); }
     return queue.run(() => {
-      if (this.sessions.get(id) !== session) throw new ApiError(409, 'session_not_connected', 'Session sudah diganti');
+      if (this.sessions.get(id) !== session) {
+        log(id, `Session sudah diganti saat di queue`);
+        throw new ApiError(409, 'session_not_connected', 'Session sudah diganti');
+      }
       return this.sendNow(id, jid, content);
     });
   }
   private async sendNow(id: string, jid: string, content: Outbound) {
     const connection = this.connected(id);
     try {
+      log(id, `Mengirim pesan ke ${jid}`);
       if (!jid.endsWith('@g.us') && connection.exists && !await connection.exists(jid)) throw new ApiError(400, 'invalid_number', 'Nomor tidak terdaftar di WhatsApp');
       if (!connection.send) throw new Error('Transport tidak mendukung pengiriman');
       const messageId = await connection.send(jid, content);
       this.sent++;
+      log(id, `Pesan berhasil dikirim: ${messageId}`);
       return { messageId, to: jid };
     } catch (error) {
       if (error instanceof ApiError) throw error;
+      log(id, `Gagal mengirim: ${error instanceof Error ? error.message : String(error)}`);
       throw new ApiError(502, 'send_failed', 'Gagal mengirim ke WhatsApp');
     }
   }
@@ -235,7 +243,10 @@ export class SessionManager {
   private async openConnection(session: Session) {
     const generation = ++session.generation;
     const connection = await this.connect(session.id, update => {
-      if (this.sessions.get(session.id) !== session || generation !== session.generation) return;
+      if (this.sessions.get(session.id) !== session || generation !== session.generation) {
+        log(session.id, `Update diabaikan: session diganti atau generation berubah (gen=${generation} vs ${session.generation})`);
+        return;
+      }
       if (update.incoming) {
         this.received++;
         if ((session.filter === 'private' && update.incoming.isGroup) || (session.filter === 'group' && !update.incoming.isGroup)) return;
@@ -243,6 +254,7 @@ export class SessionManager {
         return;
       }
       if (update.disconnected !== undefined) {
+        log(session.id, `Koneksi putus dengan kode: ${update.disconnected}`);
         session.generation++;
         session.qr = null;
         if (update.disconnected === 401) {
@@ -260,7 +272,10 @@ export class SessionManager {
       if (update.status === 'connected' || update.status === 'logged_out') session.qr = null;
       void this.persist(session).catch(() => log(session.id, `Gagal menyimpan metadata`));
     });
-    if (generation !== session.generation) await connection.close();
+    if (generation !== session.generation) {
+      log(session.id, `Koneksi ditutup karena generation berubah`);
+      await connection.close();
+    }
     else session.connection = connection;
   }
   private status(session: Session, status: Status, reason: string) {
